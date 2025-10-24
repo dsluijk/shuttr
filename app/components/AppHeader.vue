@@ -1,24 +1,10 @@
 <template>
-  <UHeader mode="drawer" title="Shuttr">
+  <UHeader title="Shuttr" :toggle="false">
     <template #right>
-      <UButton
-        label="Sign in"
-        color="neutral"
-        variant="outline"
-        to="/login"
-        class="hidden lg:inline-flex"
-      />
-    </template>
-
-    <template #body>
-      <UButton
-        label="Sign in"
-        color="neutral"
-        variant="subtle"
-        to="/login"
-        block
-        class="mb-3"
-      />
+      <AuthState v-slot="{ loggedIn, user, clear }">
+        <ProfileDropdown v-if="loggedIn" :user :clear />
+        <LoginModal v-else />
+      </AuthState>
     </template>
   </UHeader>
 </template>

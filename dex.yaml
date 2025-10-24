@@ -1,0 +1,23 @@
+issuer: http://localhost:5556/dex
+storage:
+  type: memory
+web:
+  http: 0.0.0.0:5556
+staticClients:
+  - id: shuttr_dev
+    redirectURIs:
+      - "http://localhost:3000/auth/develop"
+    name: "Shuttr Development Server"
+    secret: ZXhhbXBsZS1hcHAtc2VjcmV0
+enablePasswordDB: true
+staticPasswords:
+  - email: "admin@example.com"
+    # Password: welcome
+    hash: "$2y$10$MKJLIvN/z92idvDVroMgleS9ZAkIv3b1rucyX1hY7rW3NXvAOMb/a"
+    username: "admin"
+    userID: "1"
+  - email: "user@example.com"
+    # Password: welcome
+    hash: "$2y$10$MKJLIvN/z92idvDVroMgleS9ZAkIv3b1rucyX1hY7rW3NXvAOMb/a"
+    username: "user"
+    userID: "2"
