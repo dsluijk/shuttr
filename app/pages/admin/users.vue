@@ -1,9 +1,9 @@
 <template>
   <div>
     <UPageHeader
-      title="Albums"
-      description="Manage your albums or upload new ones."
-      icon="i-lucide-albums"
+      title="Users"
+      description="View and manage all registered users."
+      icon="i-lucide-users"
     />
 
     <UEmpty

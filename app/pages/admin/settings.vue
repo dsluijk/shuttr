@@ -1,9 +1,9 @@
 <template>
   <div>
     <UPageHeader
-      title="Albums"
-      description="Manage your albums or upload new ones."
-      icon="i-lucide-albums"
+      title="Settings"
+      description="Change global Shuttr settings."
+      icon="i-lucide-settings"
     />
 
     <UEmpty
