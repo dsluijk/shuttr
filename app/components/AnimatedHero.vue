@@ -2,6 +2,7 @@
   <UPageHero>
     <template #headline>
       <Motion
+        v-if="image"
         class="w-full"
         :initial="{
           scale: 1.05,
@@ -19,8 +20,8 @@
         }"
       >
         <NuxtImg
-          :src="page.image"
-          alt="Header image"
+          :src="image"
+          :alt="title"
           class="rounded-lg w-full lg:h-[350px] h-[250px] object-cover object-center"
         />
       </Motion>
@@ -43,7 +44,7 @@
           delay: 0.1,
         }"
       >
-        {{ page.title }}
+        {{ title }}
       </Motion>
     </template>
 
@@ -64,7 +65,7 @@
           delay: 0.15,
         }"
       >
-        {{ page.description }}
+        {{ description }}
       </Motion>
     </template>
 
@@ -76,6 +77,8 @@
 
 <script setup lang="ts">
 defineProps<{
-  page: IndexCollectionItem;
+  title: string;
+  description: string;
+  image?: string;
 }>();
 </script>

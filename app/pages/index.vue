@@ -1,6 +1,10 @@
 <template>
   <UPage>
-    <LandingHero :page>
+    <AnimatedHero
+      title="Shuttr Photo Gallery"
+      description="Shuttr is a simple to use self-hosted photo gallery for amateurs."
+      image="https://picsum.photos/seed/header/1920/1080"
+    >
       <template #links>
         <div class="gap-x-4 inline-flex">
           <Motion
@@ -32,12 +36,42 @@
           </Motion>
         </div>
       </template>
-    </LandingHero>
+    </AnimatedHero>
 
-    <UBlogPosts class="lg:gap-y-8">
-      <Motion
-        v-for="(post, index) in posts"
-        :key="index"
+    <UPageBody>
+      <UBlogPosts class="lg:gap-y-8">
+        <Motion
+          v-for="(post, index) in posts"
+          :key="index"
+          :initial="{
+            scale: 1.1,
+            opacity: 0,
+            filter: 'blur(20px)',
+            transform: 'translateY(10px)',
+          }"
+          :animate="{
+            scale: 1.08,
+            opacity: 0.2,
+            filter: 'blur(10px)',
+            transform: 'translateY(10px)',
+          }"
+          :while-in-view="{
+            scale: 1,
+            opacity: 1,
+            filter: 'blur(0px)',
+            transform: 'translateY(0)',
+          }"
+          :transition="{
+            duration: 0.3,
+            delay: 0.1,
+          }"
+          :in-view-options="{ once: true }"
+        >
+          <UBlogPost v-bind="post" variant="ghost" />
+        </Motion>
+      </UBlogPosts>
+
+      <!-- <Motion
         :initial="{
           scale: 1.1,
           opacity: 0,
@@ -57,59 +91,24 @@
           transform: 'translateY(0)',
         }"
         :transition="{
-          duration: 0.3,
-          delay: 0.1,
+          duration: 0.4,
+          delay: 0.5,
         }"
         :in-view-options="{ once: true }"
       >
-        <UBlogPost v-bind="post" variant="ghost" />
-      </Motion>
-    </UBlogPosts>
-
-    <!-- <Motion
-      :initial="{
-        scale: 1.1,
-        opacity: 0,
-        filter: 'blur(20px)',
-        transform: 'translateY(10px)',
-      }"
-      :animate="{
-        scale: 1.08,
-        opacity: 0.2,
-        filter: 'blur(10px)',
-        transform: 'translateY(10px)',
-      }"
-      :while-in-view="{
-        scale: 1,
-        opacity: 1,
-        filter: 'blur(0px)',
-        transform: 'translateY(0)',
-      }"
-      :transition="{
-        duration: 0.4,
-        delay: 0.5,
-      }"
-      :in-view-options="{ once: true }"
-    >
-      <UEmpty
-        variant="naked"
-        size="xl"
-        icon="i-lucide-file-question-mark"
-        title="No galleries found"
-        description="It looks like there aren't any galleries available to view for you."
-      />
-    </Motion> -->
+        <UEmpty
+          variant="naked"
+          size="xl"
+          icon="i-lucide-file-question-mark"
+          title="No galleries found"
+          description="It looks like there aren't any galleries available to view for you."
+        />
+      </Motion> -->
+    </UPageBody>
   </UPage>
 </template>
 
 <script setup lang="ts">
-const page = {
-  title: "Shuttr Photo Gallery",
-  description:
-    "Shuttr is a simple to use self-hosted photo gallery for amateurs.",
-  image: "https://picsum.photos/seed/header/1920/1080",
-};
-
 const posts = [
   {
     title: "Hello world",

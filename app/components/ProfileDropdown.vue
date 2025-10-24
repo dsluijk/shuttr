@@ -12,7 +12,7 @@
     }"
   >
     <UButton
-      color="neutral"
+      color="primary"
       variant="soft"
       class="data-[state=open]:bg-elevated"
       trailingIcon="i-lucide-chevron-down"
@@ -51,6 +51,7 @@ const items = computed<DropdownMenuItem[][]>(() => [
       label: "Albums",
       icon: "i-lucide-folders",
       to: "/admin",
+      exact: true,
     },
     {
       label: "Users",

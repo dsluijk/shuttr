@@ -4,6 +4,9 @@ export default defineAppConfig({
       primary: "blue",
       neutral: "neutral",
     },
+    pageBody: {
+      base: "pb-12",
+    },
     pageHero: {
       slots: {
         container: "py-2 sm:py-4 lg:py-8",
