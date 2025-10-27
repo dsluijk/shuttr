@@ -14,6 +14,7 @@ import { relations } from "drizzle-orm";
 
 export enum ProviderEnum {
   DEVELOP = "develop",
+  AUTHENTIK = "authentik",
 }
 
 export const provider = pgEnum("provider", enumToPgEnum(ProviderEnum));

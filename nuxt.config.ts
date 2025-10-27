@@ -17,6 +17,18 @@ export default defineNuxtConfig({
 
   compatibilityDate: "2024-11-01",
 
+  runtimeConfig: {
+    oauth: {
+      authentik: {
+        displayName: "Authentik",
+        groups: {
+          admin: "",
+          publisher: "",
+        },
+      },
+    },
+  },
+
   nitro: {
     experimental: {
       openAPI: true,

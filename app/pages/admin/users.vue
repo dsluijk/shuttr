@@ -29,12 +29,13 @@ if (await denies(listUsers)) {
 }
 
 const { data, status, error, refresh, clear } = await useFetch("/api/users");
+const { data: providerData } = await useFetch("/api/auth");
 
 const UBadge = resolveComponent("UBadge");
 const UIcon = resolveComponent("UIcon");
 const UTooltip = resolveComponent("UTooltip");
 
-const columns: TableColumn<typeof data>[] = [
+const columns: TableColumn<typeof data>[] = computed(() => [
   {
     accessorKey: "name",
     header: "Name",
@@ -64,19 +65,31 @@ const columns: TableColumn<typeof data>[] = [
     cell: ({ row }) => {
       return h(
         "span",
-        row.getValue("providers").map((provider) =>
-          h(
-            UTooltip,
-            {
-              text: provider["provider"],
-              delayDuration: 0,
-              class: "size-4 mr-2",
-            },
-            () => h(UIcon, { name: "i-simple-icons-openid" }, () => [])
+        row
+          .getValue("providers")
+          .filter((provider) => providerData.value[provider["provider"]].active)
+          .map((provider) =>
+            h(
+              UTooltip,
+              {
+                text: providerData.value[provider["provider"]].displayName,
+                delayDuration: 0,
+                class: "size-4 mr-2",
+              },
+              () =>
+                h(
+                  UIcon,
+                  {
+                    name: `i-simple-icons-${
+                      providerData.value[provider["provider"]].icon
+                    }`,
+                  },
+                  () => []
+                )
+            )
           )
-        )
       );
     },
   },
-];
+]);
 </script>

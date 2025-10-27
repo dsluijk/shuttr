@@ -1,7 +1,12 @@
 <template>
-  <UModal v-model:open="open">
-    <UButton label="Sign in" color="neutral" variant="outline" />
+  <UButton
+    label="Sign in"
+    color="neutral"
+    variant="outline"
+    @click="quickOpen"
+  />
 
+  <UModal v-model:open="open">
     <template #content>
       <div class="p-4 sm:p-6">
         <UAuthForm
@@ -20,23 +25,27 @@
 </template>
 
 <script setup lang="ts">
-import type { ButtonProps } from "@nuxt/ui";
-
-const { loggedIn, session, fetch, clear, openInPopup } = useUserSession();
 const open = ref(false);
 
-const providers = ref<ButtonProps[]>([
-  {
-    label: "Development",
-    icon: "i-simple-icons-openid",
-    to: "/auth/develop",
-    external: true,
-  },
-]);
+const { data: authData } = await useFetch("/api/auth");
+const providers = computed(() =>
+  Object.entries(authData.value)
+    .map(([name, data]) => ({ ...data, name }))
+    .filter((method) => method.active)
+    .map((method) => ({
+      label: method.displayName,
+      icon: `i-simple-icons-${method.icon}`,
+      to: `/auth/${method.name}`,
+      external: true,
+    }))
+);
 
-import type { DropdownMenuItem } from "@nuxt/ui";
-
-defineProps<{
-  collapsed?: boolean;
-}>();
+const quickOpen = async () => {
+  if (providers.value.length === 1) {
+    // There is only one provider, so we will start the flow immediately.
+    await navigateTo(providers.value[0].to, { external: true });
+  } else {
+    open.value = true;
+  }
+};
 </script>

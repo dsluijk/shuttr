@@ -8,6 +8,13 @@
       "when": 1761581109801,
       "tag": "0000_user",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1761587820761,
+      "tag": "0001_provider_authentik",
+      "breakpoints": true
     }
   ]
 }
