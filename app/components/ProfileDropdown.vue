@@ -47,9 +47,7 @@ const logout = async () => {
   });
 };
 
-const { data: canListUser } = await useAsyncData("perms:listUsers", () =>
-  allows(listUsers)
-);
+const canListUsers = await allows(listUsers);
 
 const items = computed<DropdownMenuItem[][]>(() =>
   [
@@ -64,7 +62,7 @@ const items = computed<DropdownMenuItem[][]>(() =>
         label: "Users",
         icon: "i-lucide-users",
         to: "/admin/users",
-        show: canListUser,
+        show: canListUsers,
       },
       {
         label: "Settings",
@@ -85,9 +83,7 @@ const items = computed<DropdownMenuItem[][]>(() =>
       },
     ],
   ]
-    .map((part) =>
-      part.filter((row) => row.show === undefined || row.show.value)
-    )
+    .map((part) => part.filter((row) => row.show === undefined || row.show))
     .filter((part) => part.length > 0)
 );
 </script>

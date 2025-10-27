@@ -18,9 +18,7 @@
 <script setup lang="ts">
 import { listUsers } from "~~/shared/utils/abilities";
 
-const { data: canListUser } = await useAsyncData("perms:listUsers", () =>
-  allows(listUsers)
-);
+const canListUsers = await allows(listUsers);
 
 const items = computed<DropdownMenuItem[][]>(() =>
   [
@@ -34,13 +32,13 @@ const items = computed<DropdownMenuItem[][]>(() =>
       label: "Users",
       icon: "i-lucide-users",
       to: "/admin/users",
-      show: canListUser,
+      show: canListUsers,
     },
     {
       label: "Settings",
       icon: "i-lucide-settings",
       to: "/admin/settings",
     },
-  ].filter((row) => row.show === undefined || row.show.value)
+  ].filter((row) => row.show === undefined || row.show)
 );
 </script>
