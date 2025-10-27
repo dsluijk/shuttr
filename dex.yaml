@@ -16,8 +16,13 @@ staticPasswords:
     hash: "$2y$10$MKJLIvN/z92idvDVroMgleS9ZAkIv3b1rucyX1hY7rW3NXvAOMb/a"
     username: "admin"
     userID: "1"
-  - email: "user@example.com"
+  - email: "publisher@example.com"
     # Password: welcome
     hash: "$2y$10$MKJLIvN/z92idvDVroMgleS9ZAkIv3b1rucyX1hY7rW3NXvAOMb/a"
-    username: "user"
+    username: "publisher"
     userID: "2"
+  - email: "guest@example.com"
+    # Password: welcome
+    hash: "$2y$10$MKJLIvN/z92idvDVroMgleS9ZAkIv3b1rucyX1hY7rW3NXvAOMb/a"
+    username: "guest"
+    userID: "3"

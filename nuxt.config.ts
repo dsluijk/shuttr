@@ -6,6 +6,7 @@ export default defineNuxtConfig({
     "@vueuse/nuxt",
     "motion-v/nuxt",
     "nuxt-auth-utils",
+    "nuxt-authorization",
   ],
 
   devtools: {
@@ -15,6 +16,12 @@ export default defineNuxtConfig({
   css: ["~/assets/css/main.css"],
 
   compatibilityDate: "2024-11-01",
+
+  nitro: {
+    experimental: {
+      openAPI: true,
+    },
+  },
 
   eslint: {
     config: {

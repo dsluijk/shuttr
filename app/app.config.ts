@@ -5,7 +5,7 @@ export default defineAppConfig({
       neutral: "neutral",
     },
     pageBody: {
-      base: "pb-12",
+      base: "pb-8",
     },
     pageHero: {
       slots: {
