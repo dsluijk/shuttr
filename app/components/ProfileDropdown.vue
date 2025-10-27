@@ -45,6 +45,7 @@ const logout = async () => {
     color: "success",
     icon: "i-lucide-power-off",
   });
+  await navigateTo("/");
 };
 
 const canListUsers = await allows(listUsers);
