@@ -15,6 +15,13 @@
       "when": 1761587820761,
       "tag": "0001_provider_authentik",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1761654520646,
+      "tag": "0002_albums",
+      "breakpoints": true
     }
   ]
 }

@@ -1,12 +1,12 @@
 <template>
-  <UPage>
+  <UPage v-if="album">
     <AnimatedHero
-      title="Trip to Alaska"
-      description="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris ex magna, placerat vel varius eu, vulputate id purus."
+      :title="album.title"
+      :description="album.description"
       image="https://picsum.photos/seed/a/1920/1080"
     />
 
-    <UPageBody>
+    <UPageBody class="mt-0">
       <Motion
         :initial="{
           scale: 1.1,
@@ -36,8 +36,8 @@
           variant="naked"
           size="xl"
           icon="i-lucide-file-question-mark"
-          title="No galleries found"
-          description="It looks like there aren't any galleries available to view for you."
+          title="No photos found"
+          description="It looks like there aren't any photos in this album."
         />
       </Motion>
     </UPageBody>
@@ -46,12 +46,9 @@
 
 <script setup lang="ts">
 const route = useRoute();
+const { data: album } = await useFetch(`/api/albums/${route.params.slug}`);
 
-if (route.params.slug === "yeet") {
-  throw createError({
-    statusCode: 404,
-    statusMessage: "Page not found",
-    fatal: true,
-  });
+if (!album.value) {
+  throw createError({ statusCode: 404, statusMessage: "Album Not Found" });
 }
 </script>
