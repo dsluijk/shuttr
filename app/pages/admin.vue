@@ -1,6 +1,6 @@
 <template>
   <UPage>
-    <template #left>
+    <template #left v-if="items.length > 1">
       <UPageAside>
         <UNavigationMenu
           :items="items"
@@ -16,9 +16,10 @@
 </template>
 
 <script setup lang="ts">
-import { listUsers } from "~~/shared/utils/abilities";
+import { listUsers, createAlbum } from "~~/shared/utils/abilities";
 
 const canListUsers = await allows(listUsers);
+const canCreateAlbum = await allows(createAlbum);
 
 const items = computed<DropdownMenuItem[][]>(() =>
   [
@@ -26,6 +27,7 @@ const items = computed<DropdownMenuItem[][]>(() =>
       label: "Albums",
       icon: "i-lucide-folders",
       to: "/admin",
+      show: canCreateAlbum,
       exact: true,
     },
     {

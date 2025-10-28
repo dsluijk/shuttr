@@ -68,11 +68,9 @@
             />
           </div>
 
-          <div class="flex w-full md:w-auto flex-wrap items-center gap-1.5">
-            <Can :ability="createAlbum">
-              <AlbumCreateModal />
-            </Can>
-          </div>
+          <div
+            class="flex w-full md:w-auto flex-wrap items-center gap-1.5"
+          ></div>
         </div>
       </Motion>
 
@@ -152,7 +150,5 @@
 </template>
 
 <script setup lang="ts">
-import { createAlbum } from "~~/shared/utils/abilities";
-
-const { data: albums } = useFetch("/api/albums");
+const { data: albums } = await useFetch("/api/albums");
 </script>

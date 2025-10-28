@@ -12,7 +12,7 @@
     }"
   >
     <UButton
-      color="primary"
+      color="neutral"
       variant="soft"
       class="data-[state=open]:bg-elevated"
       trailingIcon="i-lucide-chevron-down"
@@ -28,7 +28,7 @@
 import type { DropdownMenuItem } from "@nuxt/ui";
 import type { User } from "#auth-utils";
 
-import { listUsers } from "~~/shared/utils/abilities";
+import { listUsers, createAlbum } from "~~/shared/utils/abilities";
 
 const props = defineProps<{
   user: User;
@@ -49,6 +49,7 @@ const logout = async () => {
 };
 
 const canListUsers = await allows(listUsers);
+const canCreateAlbum = await allows(createAlbum);
 
 const items = computed<DropdownMenuItem[][]>(() =>
   [
@@ -57,6 +58,7 @@ const items = computed<DropdownMenuItem[][]>(() =>
         label: "Albums",
         icon: "i-lucide-folders",
         to: "/admin",
+        show: canCreateAlbum,
         exact: true,
       },
       {

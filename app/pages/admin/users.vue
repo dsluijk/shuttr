@@ -24,9 +24,7 @@ import type { TableColumn } from "@nuxt/ui";
 
 import { listUsers } from "~~/shared/utils/abilities";
 
-if (await denies(listUsers)) {
-  await navigateTo("/admin");
-}
+await authorize(listUsers);
 
 const { data, status, error, refresh, clear } = await useFetch("/api/users");
 const { data: providerData } = await useFetch("/api/auth");
@@ -34,7 +32,6 @@ const { data: providerData } = await useFetch("/api/auth");
 const UBadge = resolveComponent("UBadge");
 const UIcon = resolveComponent("UIcon");
 const UTooltip = resolveComponent("UTooltip");
-
 const columns: TableColumn<typeof data>[] = computed(() => [
   {
     accessorKey: "name",
