@@ -57,20 +57,19 @@ const items = computed<DropdownMenuItem[][]>(() =>
       {
         label: "Albums",
         icon: "i-lucide-folders",
-        to: "/admin",
+        to: "/manage/albums",
         show: canCreateAlbum,
-        exact: true,
       },
       {
         label: "Users",
         icon: "i-lucide-users",
-        to: "/admin/users",
+        to: "/manage/users",
         show: canListUsers,
       },
       {
         label: "Settings",
         icon: "i-lucide-settings",
-        to: "/admin/settings",
+        to: "/manage/settings",
       },
     ],
     [
