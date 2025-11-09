@@ -4,7 +4,12 @@ export default defineEventHandler(async (event) => {
   const { id } = await getValidatedRouterParams(event, paramSchema.parse);
   const storage = useStorage();
 
-  return await storage.getItemRaw(`photo:original:${id}`);
+  const photo = await storage.getItemRaw(`photo:original:${id}`);
+  if (!photo) {
+    throw createError({ statusCode: 404, message: "Photo not found." });
+  }
+
+  return photo;
 });
 
 const paramSchema = z.object({

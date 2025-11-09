@@ -11,6 +11,10 @@ export default defineEventHandler(async (event) => {
   }
 
   const original = await storage.getItemRaw(`photo:original:${id}`);
+  if (!original) {
+    throw createError({ statusCode: 404, message: "Photo not found." });
+  }
+
   thumb = await sharp(original)
     .webp()
     .ensureAlpha()

@@ -36,6 +36,13 @@ export default defineNuxtConfig({
       file: {
         base: "./storage",
       },
+      s3: {
+        accessKey: "",
+        secretKey: "",
+        bucket: "",
+        endpoint: "",
+        region: "",
+      },
     },
   },
 
