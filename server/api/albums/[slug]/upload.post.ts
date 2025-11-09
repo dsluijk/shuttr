@@ -11,6 +11,8 @@ import z from "zod";
 import { PhotoType } from "~~/server/database/schema/photo";
 
 export default defineEventHandler(async (event) => {
+  await authorize(event, uploadPhotos);
+
   const { slug } = await getValidatedRouterParams(event, paramSchema.parse);
   const db = useDrizzle();
   const album = await db.query.album.findFirst({

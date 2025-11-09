@@ -30,6 +30,14 @@ export const createAlbum = defineAbility((user: User) => {
   return deny();
 });
 
+export const uploadPhotos = defineAbility((user: User) => {
+  if (atLeastRole(UserRole.PUBLISHER, user.role)) {
+    return allow();
+  }
+
+  return deny();
+});
+
 export const viewAuthenticatedAlbums = defineAbility(() => {
   // This blocks unauthenticated users.
   return allow();
