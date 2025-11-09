@@ -32,7 +32,10 @@ services:
     environment:
       ADMINER_DEFAULT_SERVER: postgres
   minio:
-    image: bitnami/minio:latest
+    container_name: minio
+    image: minio/minio:latest
+    entrypoint: sh
+    command: -c 'mkdir -p /data/shuttr && /usr/bin/minio server --console-address ":9001" --quiet /data'
     ports:
       - 9000:9000
       - 9001:9001
@@ -43,7 +46,7 @@ services:
       MINIO_SCHEME: http
       MINIO_SERVER_URL: http://localhost:9000
     volumes:
-      - minio:/bitnami/minio/data
+      - minio:/data
 
 volumes:
   postgres: {}
