@@ -12,7 +12,7 @@
     }"
   >
     <UButton
-      color="neutral"
+      color="primary"
       variant="soft"
       class="data-[state=open]:bg-elevated"
       trailingIcon="i-lucide-chevron-down"

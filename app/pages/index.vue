@@ -3,7 +3,6 @@
     <AnimatedHero
       title="Shuttr Photo Gallery"
       description="Shuttr is a simple to use self-hosted photo gallery for amateurs."
-      image="https://picsum.photos/seed/header/1920/1080"
     >
       <template #links>
         <div class="gap-x-4 inline-flex">
@@ -107,7 +106,13 @@
             :date="album.createdAt"
             :to="computed(() => `/${album.slug}`)"
             variant="ghost"
-          />
+          >
+            <template #header>
+              <div
+                class="rounded-lg w-full h-full bg-radial-[at_60%_60%] from-neutral-300 to-neutral-100 dark:from-neutral-800 dark:to-neutral-700"
+              />
+            </template>
+          </UBlogPost>
         </Motion>
       </UBlogPosts>
 

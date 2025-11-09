@@ -1,4 +1,5 @@
 import fsDriver from "unstorage/drivers/fs";
+import lruCacheDriver from "unstorage/drivers/lru-cache";
 
 export default defineNitroPlugin(() => {
   const config = useRuntimeConfig();
@@ -12,5 +13,10 @@ export default defineNitroPlugin(() => {
     base: `${config.storage.file.base}/photo/original`,
   });
 
+  const thumbPhotoDriver = lruCacheDriver({
+    max: Number(config.storage.thumb.cacheMax) || 1000,
+  });
+
   storage.mount("photo:original", originalPhotoDriver);
+  storage.mount("photo:thumb", thumbPhotoDriver);
 });

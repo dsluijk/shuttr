@@ -3,6 +3,7 @@ export default defineNuxtConfig({
     "@nuxt/eslint",
     "@nuxt/image",
     "@nuxt/ui",
+    "@unlazy/nuxt",
     "@vueuse/nuxt",
     "motion-v/nuxt",
     "nuxt-auth-utils",
@@ -29,6 +30,9 @@ export default defineNuxtConfig({
     },
     storage: {
       type: "file",
+      thumb: {
+        cacheMax: 1000,
+      },
       file: {
         base: "./storage",
       },

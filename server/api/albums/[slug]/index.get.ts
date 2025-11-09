@@ -27,7 +27,11 @@ export default defineEventHandler(async (event) => {
             : undefined
         )
       ),
-    with: { photos: true },
+    with: {
+      photos: {
+        orderBy: (photo, { asc }) => [asc(photo.dateTime)],
+      },
+    },
   });
 });
 
