@@ -13,11 +13,10 @@ RUN pnpm run build
 FROM node:24-alpine
 WORKDIR /app
 
-RUN corepack enable
-RUN pnpm i drizzle-kit drizzle-orm pg dotenv
 COPY ./drizzle.config.ts ./
 COPY ./server/database/migrations ./server/database/migrations
 COPY --from=build /app/.output/ ./
+COPY --from=build /app/node_modules/ ./
 ENV PORT=80
 ENV HOST=0.0.0.0
 
