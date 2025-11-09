@@ -13,9 +13,13 @@ RUN pnpm run build
 FROM node:24-alpine
 WORKDIR /app
 
+RUN corepack enable
+RUN pnpm i drizzle-kit dotenv
+COPY ./drizzle.config.ts ./
+COPY ./server/database/migrations ./server/database/migrations
 COPY --from=build /app/.output/ ./
 ENV PORT=80
 ENV HOST=0.0.0.0
 
 EXPOSE 80
-CMD ["node", "/app/server/index.mjs"]
+CMD ["sh", "-c", "pnpm drizzle-kit migrate && node ./server/index.mjs"]
