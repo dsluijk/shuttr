@@ -16,7 +16,7 @@ WORKDIR /app
 COPY ./drizzle.config.ts ./
 COPY ./server/database/migrations ./server/database/migrations
 COPY --from=build /app/.output/ ./
-COPY --from=build /app/node_modules/ ./
+COPY --from=build /app/node_modules ./node_modules
 ENV PORT=80
 ENV HOST=0.0.0.0
 
