@@ -96,15 +96,10 @@ const visibilityProps = ref({
 });
 
 const columnVisibility = ref({
-  id: false,
   slug: false,
 });
 
 const columns: TableColumn<typeof albums>[] = computed(() => [
-  {
-    accessorKey: "id",
-    header: "#",
-  },
   {
     accessorKey: "slug",
     header: "Slug",
@@ -145,7 +140,7 @@ const editAlbumItems = (row) => [
     {
       label: "Edit",
       icon: "i-lucide-pencil",
-      to: `/manage/albums/${row.getValue("id")}`,
+      to: `/manage/albums/${row.getValue("slug")}`,
     },
   ],
   [

@@ -76,7 +76,7 @@
 
       <UBlogPosts v-if="albums.length > 0" class="lg:gap-y-8">
         <Motion
-          v-for="(album, index) in albums"
+          v-for="(album, index) of albums"
           :key="index"
           :initial="{
             scale: 1.1,

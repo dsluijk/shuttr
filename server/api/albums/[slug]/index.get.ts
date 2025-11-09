@@ -27,6 +27,7 @@ export default defineEventHandler(async (event) => {
             : undefined
         )
       ),
+    with: { photos: true },
   });
 });
 

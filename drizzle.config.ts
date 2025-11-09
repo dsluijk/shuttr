@@ -6,11 +6,8 @@ export default defineConfig({
   dialect: "postgresql",
   schema: "./server/database/schema/*",
   out: "./server/database/migrations",
+  extensionsFilters: ["postgis"],
   dbCredentials: {
     url: process.env.DATABASE_URL!,
-  },
-  migrations: {
-    table: "migrations",
-    schema: "public",
   },
 });

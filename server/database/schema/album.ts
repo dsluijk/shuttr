@@ -7,6 +7,8 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 import { cuid2, enumToPgEnum } from "./utils";
+import { relations } from "drizzle-orm";
+import { photo } from "./photo";
 
 export enum AlbumVisibility {
   // Anyone can see the album on the homepage.
@@ -39,3 +41,7 @@ export const album = pgTable(
   },
   (t) => [index().on(t.slug)]
 );
+
+export const albumRelations = relations(album, ({ many }) => ({
+  photos: many(photo),
+}));

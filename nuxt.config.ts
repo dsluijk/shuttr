@@ -27,6 +27,12 @@ export default defineNuxtConfig({
         },
       },
     },
+    storage: {
+      type: "file",
+      file: {
+        base: "./storage",
+      },
+    },
   },
 
   nitro: {

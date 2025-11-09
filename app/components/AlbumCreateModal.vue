@@ -108,6 +108,6 @@ const createAlbum = async (event: FormSubmitEvent<Schema>) => {
     color: "success",
   });
 
-  await navigateTo(`/${createdAlbum.slug}`);
+  await navigateTo(`/manage/albums/${createdAlbum.slug}`);
 };
 </script>
