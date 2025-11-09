@@ -15,5 +15,14 @@ export default defineEventHandler(async (event) => {
         && !!oauth.authentik.clientId
         && !!oauth.authentik.clientSecret,
     },
+    keycloak: {
+      displayName: oauth.keycloak.displayName ?? "Keycloak",
+      icon: "keycloak",
+      active:
+        !!oauth.keycloak.serverUrl
+        && !!oauth.keycloak.clientId
+        && !!oauth.keycloak.clientSecret
+        && !!oauth.keycloak.realm,
+    },
   };
 });

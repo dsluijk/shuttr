@@ -27,6 +27,13 @@ export default defineNuxtConfig({
           publisher: "",
         },
       },
+      keycloak: {
+        displayName: "Keycloak",
+        groups: {
+          admin: "",
+          publisher: "",
+        },
+      },
     },
     storage: {
       type: "file",
