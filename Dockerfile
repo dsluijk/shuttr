@@ -21,4 +21,4 @@ ENV PORT=80
 ENV HOST=0.0.0.0
 
 EXPOSE 80
-CMD ["sh", "-c", "pnpm drizzle-kit migrate && node ./server/index.mjs"]
+CMD ["sh", "-c", "./node_modules/drizzle-kit/bin.cjs migrate && node ./server/index.mjs"]
