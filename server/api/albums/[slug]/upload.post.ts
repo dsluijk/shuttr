@@ -3,9 +3,9 @@ import { rgbaToThumbHash } from "thumbhash";
 import exifReader from "exifreader";
 import sharp from "sharp";
 import dayjs from "dayjs";
-import customParseFormat from "dayjs/plugin/customParseFormat";
-import timezone from "dayjs/plugin/timezone";
-import utc from "dayjs/plugin/utc";
+import customParseFormat from "dayjs/plugin/customParseFormat.js";
+import timezone from "dayjs/plugin/timezone.js";
+import utc from "dayjs/plugin/utc.js";
 import z from "zod";
 
 import { PhotoType } from "~~/server/database/schema/photo";
