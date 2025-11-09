@@ -14,7 +14,7 @@ FROM node:24-alpine
 WORKDIR /app
 
 RUN corepack enable
-RUN pnpm i drizzle-kit dotenv
+RUN pnpm i drizzle-kit drizzle-orm dotenv
 COPY ./drizzle.config.ts ./
 COPY ./server/database/migrations ./server/database/migrations
 COPY --from=build /app/.output/ ./
