@@ -2,15 +2,18 @@ import sharp from "sharp";
 import z from "zod";
 
 export default defineEventHandler(async (event) => {
-  const { id } = await getValidatedRouterParams(event, paramSchema.parse);
+  const { album, id } = await getValidatedRouterParams(
+    event,
+    paramSchema.parse
+  );
   const storage = useStorage();
 
-  let thumb = await storage.getItemRaw(`photo:thumb:${id}`);
+  let thumb = await storage.getItemRaw(`photo:thumb:${album}:${id}`);
   if (thumb) {
     return thumb;
   }
 
-  const original = await storage.getItemRaw(`photo:original:${id}`);
+  const original = await storage.getItemRaw(`photo:original:${album}:${id}`);
   if (!original) {
     throw createError({ statusCode: 404, message: "Photo not found." });
   }
@@ -21,10 +24,11 @@ export default defineEventHandler(async (event) => {
     .resize(400, 400, { fit: "outside" })
     .toBuffer();
 
-  await storage.setItemRaw(`photo:thumb:${id}`, thumb);
+  await storage.setItemRaw(`photo:thumb:${album}:${id}`, thumb);
   return thumb;
 });
 
 const paramSchema = z.object({
+  album: z.cuid2(),
   id: z.cuid2(),
 });

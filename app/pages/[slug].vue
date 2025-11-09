@@ -29,7 +29,7 @@
           :in-view-options="{ once: true }"
         >
           <UnLazyImage
-            :src="`/photo/${photo.id}/thumb`"
+            :src="`/photo/${album.id}/${photo.id}/thumb`"
             :thumbhash="photo.thumbHash"
             :width="photo.width"
             :height="photo.height"

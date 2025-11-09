@@ -130,7 +130,7 @@ export default defineEventHandler(async (event) => {
 
   const photo = result[0];
   const storage = useStorage();
-  await storage.setItemRaw(`photo:original:${photo.id}`, file);
+  await storage.setItemRaw(`photo:original:${album.id}:${photo.id}`, file);
 
   return photo;
 });

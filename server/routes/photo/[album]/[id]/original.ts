@@ -1,10 +1,13 @@
 import z from "zod";
 
 export default defineEventHandler(async (event) => {
-  const { id } = await getValidatedRouterParams(event, paramSchema.parse);
+  const { album, id } = await getValidatedRouterParams(
+    event,
+    paramSchema.parse
+  );
   const storage = useStorage();
 
-  const photo = await storage.getItemRaw(`photo:original:${id}`);
+  const photo = await storage.getItemRaw(`photo:original:${album}:${id}`);
   if (!photo) {
     throw createError({ statusCode: 404, message: "Photo not found." });
   }
@@ -13,5 +16,6 @@ export default defineEventHandler(async (event) => {
 });
 
 const paramSchema = z.object({
+  album: z.cuid2(),
   id: z.cuid2(),
 });
