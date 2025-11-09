@@ -10,19 +10,16 @@
           :initial="{
             scale: 1.1,
             opacity: 0,
-            filter: 'blur(20px)',
             transform: 'translateY(10px)',
           }"
           :animate="{
             scale: 1.08,
             opacity: 0.6,
-            filter: 'blur(10px)',
             transform: 'translateY(10px)',
           }"
           :while-in-view="{
             scale: 1,
             opacity: 1,
-            filter: 'blur(0px)',
             transform: 'translateY(0)',
           }"
           :transition="{
