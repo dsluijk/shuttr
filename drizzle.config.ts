@@ -7,6 +7,10 @@ export default defineConfig({
   schema: "./server/database/schema/*",
   out: "./server/database/migrations",
   extensionsFilters: ["postgis"],
+  migrations: {
+    table: "_drizzle_migrations",
+    schema: "public",
+  },
   dbCredentials: {
     host: process.env.DATABASE_HOST || "localhost",
     port: Number(process.env.DATABASE_HOST) || 5432,
