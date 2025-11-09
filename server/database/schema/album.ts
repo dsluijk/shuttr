@@ -21,7 +21,7 @@ export enum AlbumVisibility {
 
 export const albumVisibilityColumn = pgEnum(
   "album_visibility",
-  enumToPgEnum(AlbumVisibility)
+  enumToPgEnum(AlbumVisibility),
 );
 
 export const album = pgTable(
@@ -39,7 +39,7 @@ export const album = pgTable(
     sharingAllowed: boolean().notNull(),
     createdAt: timestamp().notNull().defaultNow(),
   },
-  (t) => [index().on(t.slug)]
+  (t) => [index().on(t.slug)],
 );
 
 export const albumRelations = relations(album, ({ many }) => ({

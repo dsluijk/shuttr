@@ -11,12 +11,15 @@
     </UPageHeader>
 
     <UPageBody>
-      <UPageCard variant="subtle" class="overflow-x-auto">
+      <UPageCard
+        variant="subtle"
+        class="overflow-x-auto"
+      >
         <UTable
+          v-model:columnVisibility="columnVisibility"
           :data="albums"
           :columns="columns"
           :loading="status === 'pending'"
-          v-model:column-visibility="columnVisibility"
         >
           <template #sharingAllowed-cell="{ row }">
             <UBadge
@@ -44,7 +47,10 @@
               :delayDuration="0"
               class="size-4 mr-2"
             >
-              <NuxtTime :datetime="row.getValue('createdAt')" relative />
+              <NuxtTime
+                :datetime="row.getValue('createdAt')"
+                relative
+              />
             </UTooltip>
           </template>
 
@@ -161,7 +167,7 @@ const copyLink = (row) => {
 
   toast.add({
     title: "Link Copied",
-    description: `A link to the album has been copied to your clipboard.`,
+    description: "A link to the album has been copied to your clipboard.",
     icon: "i-lucide-clipboard",
   });
 };

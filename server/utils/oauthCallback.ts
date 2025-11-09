@@ -1,8 +1,8 @@
-import { H3Event } from "h3";
+import type { H3Event } from "h3";
 import { eq, sql } from "drizzle-orm";
 
-import { UserRole } from "../database/schema/user";
-import { ProviderEnum } from "../database/schema/userProvider";
+import type { UserRole } from "../database/schema/user";
+import type { ProviderEnum } from "../database/schema/userProvider";
 
 interface OAuthCallbackUser {
   sub: string;
@@ -17,7 +17,7 @@ export const handleOAuthCallback = async (
   event: H3Event,
   providerUsed: ProviderEnum,
   oauthUser: OAuthCallbackUser,
-  defaultRole: UserRole
+  defaultRole: UserRole,
 ) => {
   if (!oauthUser.email_verified) {
     throw createError({
@@ -109,7 +109,7 @@ export const handleOAuthCallback = async (
     },
     {
       maxAge: 60 * 60 * 24 * 7,
-    }
+    },
   );
 
   return provider;

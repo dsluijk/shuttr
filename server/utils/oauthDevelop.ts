@@ -42,16 +42,16 @@ export function defineOAuthDevelopEventHandler({
     }
 
     if (
-      !config.clientId ||
-      !config.clientSecret ||
-      !config.domain ||
-      !config.redirectURL
+      !config.clientId
+      || !config.clientSecret
+      || !config.domain
+      || !config.redirectURL
     ) {
       return handleMissingConfiguration(
         event,
         "develop",
         ["clientId", "clientSecret", "domain"],
-        onError
+        onError,
       );
     }
 
@@ -70,14 +70,14 @@ export function defineOAuthDevelopEventHandler({
           scope: (
             config.scope || ["openid", "profile", "email", "groups"]
           ).join(" "),
-        })
+        }),
       );
     }
 
     const tokens = await requestAccessToken(tokenURL, {
       headers: {
         Authorization: `Basic ${Buffer.from(
-          `${config.clientId}:${config.clientSecret}`
+          `${config.clientId}:${config.clientSecret}`,
         ).toString("base64")}`,
         "Content-Type": "application/x-www-form-urlencoded",
       },
@@ -139,11 +139,11 @@ function handleMissingConfiguration(
   event: H3Event,
   provider: OAuthProvider,
   missingKeys: string[],
-  onError?: OnError
+  onError?: OnError,
 ) {
   const environmentVariables = missingKeys.map(
     (key) =>
-      `NUXT_OAUTH_${provider.toUpperCase()}_${snakeCase(key).toUpperCase()}`
+      `NUXT_OAUTH_${provider.toUpperCase()}_${snakeCase(key).toUpperCase()}`,
   );
 
   const error = createError({
@@ -160,8 +160,8 @@ function handleMissingConfiguration(
 function handleAccessTokenErrorResponse(
   event: H3Event,
   oauthProvider: OAuthProvider,
-  oauthError: any,
-  onError?: OnError
+  oauthError: Record<string, string>,
+  onError?: OnError,
 ) {
   const message = `${upperFirst(oauthProvider)} login failed: ${
     oauthError.error_description || oauthError.error || "Unknown error"
@@ -179,21 +179,18 @@ function handleAccessTokenErrorResponse(
 
 async function requestAccessToken(
   url: string,
-  options: RequestAccessTokenOptions
-): Promise<any> {
+  options: RequestAccessTokenOptions,
+): Promise<Record<string, string>> {
   const headers = {
     "Content-Type": "application/x-www-form-urlencoded",
     ...options.headers,
   };
 
   // Encode the body as a URLSearchParams if the content type is 'application/x-www-form-urlencoded'.
+  const bodyOpts = options.body as unknown as Record<string, string>;
   const body =
     headers["Content-Type"] === "application/x-www-form-urlencoded"
-      ? new URLSearchParams(
-          (options.body as unknown as Record<string, string>) ||
-            options.params ||
-            {}
-        ).toString()
+      ? new URLSearchParams(bodyOpts || options.params || {}).toString()
       : options.body;
 
   return $fetch(url, {
@@ -208,5 +205,5 @@ async function requestAccessToken(
       return error.data;
     }
     throw error;
-  });
+  }) as Promise<Record<string, string>>;
 }

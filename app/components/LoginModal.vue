@@ -16,7 +16,12 @@
           :providers="providers"
         />
         <USeparator class="py-4" />
-        <UButton @click="open = false" variant="outline" color="neutral" block>
+        <UButton
+          variant="outline"
+          color="neutral"
+          block
+          @click="open = false"
+        >
           Cancel
         </UButton>
       </div>
@@ -37,7 +42,7 @@ const providers = computed(() =>
       icon: `i-simple-icons-${method.icon}`,
       to: `/auth/${method.name}`,
       external: true,
-    }))
+    })),
 );
 
 const quickOpen = async () => {

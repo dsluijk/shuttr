@@ -10,11 +10,10 @@ export default defineEventHandler(async (event) => {
     authentik: {
       displayName: oauth.authentik.displayName ?? "Authentik",
       icon: "authentik",
-      active: Boolean(
-        oauth.authentik.domain &&
-          oauth.authentik.clientId &&
-          oauth.authentik.clientSecret
-      ),
+      active:
+        !!oauth.authentik.domain
+        && !!oauth.authentik.clientId
+        && !!oauth.authentik.clientSecret,
     },
   };
 });

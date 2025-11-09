@@ -1,6 +1,14 @@
 <template>
-  <UModal title="Add Album" description="Create a new draft photo album.">
-    <UButton color="primary" variant="subtle" icon="i-lucide-plus" block>
+  <UModal
+    title="Add Album"
+    description="Create a new draft photo album."
+  >
+    <UButton
+      color="primary"
+      variant="subtle"
+      icon="i-lucide-plus"
+      block
+    >
       Add Album
     </UButton>
 
@@ -11,7 +19,10 @@
         class="space-y-4"
         @submit="createAlbum"
       >
-        <UFormField label="Title" name="title">
+        <UFormField
+          label="Title"
+          name="title"
+        >
           <UInput
             v-model="state.title"
             placeholder="Trip to Tokyo"
@@ -21,7 +32,10 @@
           />
         </UFormField>
 
-        <UFormField label="Description" name="description">
+        <UFormField
+          label="Description"
+          name="description"
+        >
           <UTextarea
             v-model="state.description"
             placeholder="Add a description.."
@@ -33,7 +47,10 @@
           />
         </UFormField>
 
-        <UFormField label="Visibility" name="visibility">
+        <UFormField
+          label="Visibility"
+          name="visibility"
+        >
           <USelect
             v-model="state.visibility"
             :items="visibilityOptions"
@@ -55,7 +72,12 @@
           />
         </UFormField>
 
-        <UButton type="submit" block>Submit</UButton>
+        <UButton
+          type="submit"
+          block
+        >
+          Submit
+        </UButton>
       </UForm>
     </template>
   </UModal>

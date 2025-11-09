@@ -1,6 +1,9 @@
 <template>
   <UPage>
-    <template #left v-if="items.length > 1">
+    <template
+      v-if="items.length > 1"
+      #left
+    >
       <UPageAside>
         <UNavigationMenu
           :items="items"
@@ -40,6 +43,6 @@ const items = computed<DropdownMenuItem[][]>(() =>
       icon: "i-lucide-settings",
       to: "/manage/settings",
     },
-  ].filter((row) => row.show === undefined || row.show)
+  ].filter((row) => row.show === undefined || row.show),
 );
 </script>

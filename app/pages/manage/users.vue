@@ -7,8 +7,15 @@
     />
 
     <UPageBody>
-      <UPageCard variant="subtle" class="overflow-x-auto">
-        <UTable :data="data" :columns="columns" :loading="status === 'pending'">
+      <UPageCard
+        variant="subtle"
+        class="overflow-x-auto"
+      >
+        <UTable
+          :data="data"
+          :columns="columns"
+          :loading="status === 'pending'"
+        >
           <template #role-cell="{ row }">
             <UBadge
               v-bind="roleProps[row.getValue('role')]"
@@ -21,10 +28,10 @@
 
           <template #providers-cell="{ row }">
             <UTooltip
-              v-for="(provider, index) of row
+              v-for="(provider, _index) of row
                 .getValue('providers')
                 .filter(
-                  (provider) => providerData[provider['provider']].active
+                  (provider) => providerData[provider['provider']].active,
                 )"
               :key="provider.id"
               :text="providerData[provider['provider']].displayName"
@@ -45,14 +52,13 @@
 </template>
 
 <script setup lang="ts">
-import { h, resolveComponent } from "vue";
 import type { TableColumn } from "@nuxt/ui";
 
 import { listUsers } from "~~/shared/utils/abilities";
 
 await authorize(listUsers);
 
-const { data, status, error, refresh, clear } = await useFetch("/api/users");
+const { data, status } = await useFetch("/api/users");
 const { data: providerData } = await useFetch("/api/auth");
 
 const roleProps = ref({
@@ -61,9 +67,6 @@ const roleProps = ref({
   admin: { color: "error" } as const,
 });
 
-const UBadge = resolveComponent("UBadge");
-const UIcon = resolveComponent("UIcon");
-const UTooltip = resolveComponent("UTooltip");
 const columns: TableColumn<typeof data>[] = computed(() => [
   {
     accessorKey: "name",

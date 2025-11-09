@@ -20,7 +20,7 @@ export default defineEventHandler(async (event) => {
           : undefined,
         accessLevels.private
           ? eq(album.visibility, AlbumVisibility.PRIVATE)
-          : undefined
+          : undefined,
       ),
   });
 });

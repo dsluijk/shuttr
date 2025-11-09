@@ -57,7 +57,7 @@ export const photo = pgTable(
     index().on(t.album),
     index().on(t.dateTime),
     unique().on(t.album, t.originalDigest),
-  ]
+  ],
 );
 
 export const photoRelations = relations(photo, ({ one }) => ({

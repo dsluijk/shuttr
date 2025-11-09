@@ -1,6 +1,9 @@
 <template>
   <UPage v-if="album">
-    <AnimatedHero :title="album.title" :description="album.description" />
+    <AnimatedHero
+      :title="album.title"
+      :description="album.description"
+    />
 
     <UPageBody class="mt-0">
       <UPageColumns v-if="album.photos.length > 0">
@@ -17,7 +20,7 @@
             opacity: 0.6,
             transform: 'translateY(10px)',
           }"
-          :while-in-view="{
+          :whileInView="{
             scale: 1,
             opacity: 1,
             transform: 'translateY(0)',
@@ -26,7 +29,7 @@
             duration: 0.2,
             delay: 0.15,
           }"
-          :in-view-options="{ once: true }"
+          :inViewOptions="{ once: true }"
         >
           <UnLazyImage
             :src="`/photo/${album.id}/${photo.id}/thumb`"

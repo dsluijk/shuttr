@@ -16,7 +16,7 @@ export default defineOAuthDevelopEventHandler({
       event,
       ProviderEnum.DEVELOP,
       oauthUser,
-      defaultRole
+      defaultRole,
     );
 
     return sendRedirect(event, "/");

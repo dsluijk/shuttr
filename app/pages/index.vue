@@ -67,13 +67,14 @@
             />
           </div>
 
-          <div
-            class="flex w-full md:w-auto flex-wrap items-center gap-1.5"
-          ></div>
+          <div class="flex w-full md:w-auto flex-wrap items-center gap-1.5" />
         </div>
       </Motion>
 
-      <UBlogPosts v-if="albums.length > 0" class="lg:gap-y-8">
+      <UBlogPosts
+        v-if="albums.length > 0"
+        class="lg:gap-y-8"
+      >
         <Motion
           v-for="(album, index) of albums"
           :key="index"
@@ -89,7 +90,7 @@
             filter: 'blur(10px)',
             transform: 'translateY(10px)',
           }"
-          :while-in-view="{
+          :whileInView="{
             scale: 1,
             opacity: 1,
             filter: 'blur(0px)',
@@ -99,7 +100,7 @@
             duration: 0.3,
             delay: 0.1,
           }"
-          :in-view-options="{ once: true }"
+          :inViewOptions="{ once: true }"
         >
           <UBlogPost
             :title="album.title"
@@ -130,7 +131,7 @@
           filter: 'blur(10px)',
           transform: 'translateY(10px)',
         }"
-        :while-in-view="{
+        :whileInView="{
           scale: 1,
           opacity: 1,
           filter: 'blur(0px)',
@@ -140,7 +141,7 @@
           duration: 0.4,
           delay: 0.5,
         }"
-        :in-view-options="{ once: true }"
+        :inViewOptions="{ once: true }"
       >
         <UEmpty
           variant="naked"

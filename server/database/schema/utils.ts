@@ -6,8 +6,11 @@ export const cuid2 = (length: number = 24) => {
 };
 
 // https://github.com/drizzle-team/drizzle-orm/discussions/1914#discussioncomment-9600199
-export function enumToPgEnum<T extends Record<string, any>>(
-  myEnum: T
+export function enumToPgEnum<T extends Record<string, unknown>>(
+  myEnum: T,
 ): [T[keyof T], ...T[keyof T][]] {
-  return Object.values(myEnum).map((value: any) => `${value}`) as any;
+  return Object.values(myEnum).map((value: unknown) => `${value}`) as [
+    T[keyof T],
+    ...T[keyof T][],
+  ];
 }

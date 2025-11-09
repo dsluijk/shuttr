@@ -92,7 +92,7 @@ export default defineEventHandler(async (event) => {
 
   const [dateTime, offsetTime] = getDate(tags.exif);
   const thumbHash = Buffer.from(
-    rgbaToThumbHash(info.width, info.height, data)
+    rgbaToThumbHash(info.width, info.height, data),
   ).toString("base64");
 
   const result = await db
@@ -142,7 +142,7 @@ const paramSchema = z.object({
 const readTag = <T extends object>(
   tags: T | undefined,
   key: keyof T,
-  fallback: string | undefined = undefined
+  fallback: string | undefined = undefined,
 ): string | undefined => {
   if (!tags) {
     return fallback;
@@ -157,7 +157,7 @@ const readTag = <T extends object>(
 
 const parseDate = (
   date: string | undefined,
-  tz: string | undefined
+  tz: string | undefined,
 ): [Date, string] | undefined => {
   dayjs.extend(customParseFormat);
   dayjs.extend(timezone);
@@ -183,7 +183,7 @@ const getDate = (exif: exifReader.ExifTags | undefined): [Date, string] => {
   for (const type of ["Original", "Digitized", ""]) {
     const parsed = parseDate(
       readTag(exif, ("DateTime" + type) as keyof exifReader.ExifTags),
-      readTag(exif, ("OffsetTime" + type) as keyof exifReader.ExifTags)
+      readTag(exif, ("OffsetTime" + type) as keyof exifReader.ExifTags),
     );
 
     if (parsed) {
@@ -197,7 +197,7 @@ const getDate = (exif: exifReader.ExifTags | undefined): [Date, string] => {
 };
 
 const readLocation = (
-  gps: exifReader.GpsTags | undefined
+  gps: exifReader.GpsTags | undefined,
 ): [number, number] | undefined => {
   if (!gps || !gps.Latitude || !gps.Longitude) {
     return undefined;

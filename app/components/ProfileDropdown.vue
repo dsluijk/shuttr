@@ -86,6 +86,6 @@ const items = computed<DropdownMenuItem[][]>(() =>
     ],
   ]
     .map((part) => part.filter((row) => row.show === undefined || row.show))
-    .filter((part) => part.length > 0)
+    .filter((part) => part.length > 0),
 );
 </script>

@@ -5,10 +5,10 @@ export default defineEventHandler(async (event) => {
   const { oauth } = useRuntimeConfig(event);
 
   if (
-    !Boolean(
-      oauth.authentik.domain &&
-        oauth.authentik.clientId &&
-        oauth.authentik.clientSecret
+    !(
+      oauth.authentik.domain
+      && oauth.authentik.clientId
+      && oauth.authentik.clientSecret
     )
   ) {
     throw createError({
@@ -22,15 +22,15 @@ export default defineEventHandler(async (event) => {
       let role = UserRole.GUEST;
 
       if (
-        oauth.authentik.groups.publisher !== "" &&
-        oauthUser.groups.includes(oauth.authentik.groups.publisher)
+        oauth.authentik.groups.publisher !== ""
+        && oauthUser.groups.includes(oauth.authentik.groups.publisher)
       ) {
         role = UserRole.PUBLISHER;
       }
 
       if (
-        oauth.authentik.groups.admin !== "" &&
-        oauthUser.groups.includes(oauth.authentik.groups.admin)
+        oauth.authentik.groups.admin !== ""
+        && oauthUser.groups.includes(oauth.authentik.groups.admin)
       ) {
         role = UserRole.ADMIN;
       }

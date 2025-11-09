@@ -4,7 +4,7 @@ import z from "zod";
 export default defineEventHandler(async (event) => {
   const { album, id } = await getValidatedRouterParams(
     event,
-    paramSchema.parse
+    paramSchema.parse,
   );
   const storage = useStorage();
 

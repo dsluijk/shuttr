@@ -39,7 +39,7 @@ export const userProvider = pgTable(
     index().on(t.providerUserId),
     unique().on(t.userId, t.provider),
     unique().on(t.provider, t.providerUserId),
-  ]
+  ],
 );
 
 export const userProviderRelations = relations(userProvider, ({ one }) => ({

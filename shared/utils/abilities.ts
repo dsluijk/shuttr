@@ -5,8 +5,8 @@ import { UserRole } from "~~/server/database/schema/user";
 const atLeastRole = (minimum: UserRole, userRole: UserRole | null) => {
   if (minimum === UserRole.GUEST && userRole) return true;
   if (
-    minimum === UserRole.PUBLISHER &&
-    (userRole === UserRole.PUBLISHER || userRole === UserRole.ADMIN)
+    minimum === UserRole.PUBLISHER
+    && (userRole === UserRole.PUBLISHER || userRole === UserRole.ADMIN)
   )
     return true;
   if (minimum === UserRole.ADMIN && userRole === UserRole.ADMIN) return true;

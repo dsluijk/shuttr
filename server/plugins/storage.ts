@@ -13,9 +13,9 @@ export default defineNitroPlugin(() => {
     });
   } else if (config.storage.type === "s3") {
     if (
-      !config.storage.s3.accessKey ||
-      !config.storage.s3.secretKey ||
-      !config.storage.s3.endpoint
+      !config.storage.s3.accessKey
+      || !config.storage.s3.secretKey
+      || !config.storage.s3.endpoint
     ) {
       throw createError("Incomplete S3 configuration");
     }

@@ -34,11 +34,14 @@
         class="w-full"
         multiple
       >
-        <template #files="{ files }">
-          <UPageCard variant="subtle" class="mt-4 max-h-64 overflow-y-auto">
+        <template #files="{ files: uploadFiles }">
+          <UPageCard
+            variant="subtle"
+            class="mt-4 max-h-64 overflow-y-auto"
+          >
             <UProgress
               v-model="uploaded"
-              :max="files.length"
+              :max="uploadFiles.length"
               size="lg"
               status
             />
@@ -76,7 +79,7 @@ const uploadFile = async (file: File) => {
   uploaded.value++;
 };
 
-watchArray(files, (newFiles, oldFiles, added, removed) => {
+watchArray(files, (newFiles, oldFiles, added) => {
   for (const newFile of added) {
     limit(() => uploadFile(newFile));
   }
