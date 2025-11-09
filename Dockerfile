@@ -16,9 +16,13 @@ WORKDIR /app
 COPY ./drizzle.config.ts ./
 COPY ./server/database/migrations ./server/database/migrations
 COPY --from=build /app/.output/ ./
-COPY --from=build /app/node_modules ./node_modules
+
+RUN corepack enable
+RUN pnpm i drizzle-kit drizzle-orm pg dotenv
+RUN pnpm i -C ./server dayjs
+
 ENV PORT=80
 ENV HOST=0.0.0.0
 
 EXPOSE 80
-CMD ["sh", "-c", "./node_modules/drizzle-kit/bin.cjs migrate && node ./server/index.mjs"]
+CMD ["sh", "-c", "pnpm drizzle-kit migrate && node ./server/index.mjs"]
