@@ -13,6 +13,8 @@ RUN pnpm run build
 FROM node:24-alpine
 WORKDIR /app
 
+RUN apk add --no-cache vips-dev fftw-dev build-base
+
 COPY ./drizzle.config.ts ./
 COPY ./server/database/migrations ./server/database/migrations
 COPY --from=build /app/.output/ ./
