@@ -1,4 +1,3 @@
-import sharp from "sharp";
 import z from "zod";
 
 export default defineEventHandler(async (event) => {
@@ -8,24 +7,12 @@ export default defineEventHandler(async (event) => {
   );
   const storage = useStorage();
 
-  let thumb = await storage.getItemRaw(`temp:photo:${album}:${id}:thumb`);
-  if (thumb) {
-    return thumb;
-  }
-
   const photo = await storage.getItemRaw(`storage:photo:${album}:${id}:large`);
   if (!photo) {
     throw createError({ statusCode: 404, message: "Photo not found." });
   }
 
-  thumb = await sharp(photo)
-    .webp()
-    .ensureAlpha()
-    .resize(400, 400, { fit: "outside" })
-    .toBuffer();
-
-  await storage.setItemRaw(`temp:photo:${album}:${id}:thumb`, thumb);
-  return thumb;
+  return Buffer.from(photo, "base64");
 });
 
 const paramSchema = z.object({

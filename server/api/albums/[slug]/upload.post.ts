@@ -26,22 +26,22 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const file = await readRawBody(event, false);
-  if (!file) {
+  const original = await readRawBody(event, false);
+  if (!original) {
     throw createError({
       statusCode: 400,
       statusMessage: "No image uploaded",
     });
   }
 
-  if (file.byteLength > 50 * 1024 * 1024) {
+  if (original.byteLength > 50 * 1024 * 1024) {
     throw createError({
       statusCode: 400,
       statusMessage: "Image too large",
     });
   }
 
-  const originalDigest = await createDigest(new Uint8Array(file).buffer);
+  const originalDigest = await createDigest(new Uint8Array(original).buffer);
   const existingPhotos = await db.query.photo.findMany({
     where: (photo, { and, eq }) =>
       and(eq(photo.album, album.id), eq(photo.originalDigest, originalDigest)),
@@ -55,7 +55,7 @@ export default defineEventHandler(async (event) => {
 
   let tags;
   try {
-    tags = exifReader.load(file, {
+    tags = exifReader.load(original, {
       includeUnknown: true,
       expanded: true,
     });
@@ -86,15 +86,20 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const { data, info } = await sharp(file)
+  const large = await sharp(original)
+    .webp()
+    .resize(2000, 2000, { fit: "inside", withoutEnlargement: true })
+    .toBuffer();
+
+  const { data: thumb, info: thumbInfo } = await sharp(large)
     .raw()
     .ensureAlpha()
-    .resize(32, 32, { fit: "outside" })
+    .resize(32, 32, { fit: "outside", kernel: "linear" })
     .toBuffer({ resolveWithObject: true });
 
   const [dateTime, offsetTime] = getDate(tags.exif);
   const thumbHash = Buffer.from(
-    rgbaToThumbHash(info.width, info.height, data),
+    rgbaToThumbHash(thumbInfo.width, thumbInfo.height, thumb),
   ).toString("base64");
 
   const result = await db
@@ -104,7 +109,7 @@ export default defineEventHandler(async (event) => {
       type: PhotoType[type],
       originalDigest,
       thumbHash,
-      size: file.byteLength,
+      size: original.byteLength,
       width,
       height,
       dateTime,
@@ -132,7 +137,14 @@ export default defineEventHandler(async (event) => {
 
   const photo = result[0];
   const storage = useStorage();
-  await storage.setItemRaw(`photo:original:${album.id}:${photo.id}`, file);
+  await storage.setItemRaw(
+    `storage:photo:${album.id}:${photo.id}:large`,
+    large,
+  );
+  await storage.setItemRaw(
+    `storage:photo:${album.id}:${photo.id}:original`,
+    original,
+  );
 
   return photo;
 });

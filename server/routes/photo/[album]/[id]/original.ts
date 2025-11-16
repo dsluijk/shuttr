@@ -7,12 +7,14 @@ export default defineEventHandler(async (event) => {
   );
   const storage = useStorage();
 
-  const photo = await storage.getItemRaw(`photo:original:${album}:${id}`);
+  const photo = await storage.getItemRaw(
+    `storage:photo:${album}:${id}:original`,
+  );
   if (!photo) {
     throw createError({ statusCode: 404, message: "Photo not found." });
   }
 
-  return photo;
+  return Buffer.from(photo, "base64");
 });
 
 const paramSchema = z.object({

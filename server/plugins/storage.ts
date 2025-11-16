@@ -6,10 +6,10 @@ export default defineNitroPlugin(() => {
   const config = useRuntimeConfig();
   const storage = useStorage();
 
-  let originalPhotoDriver;
+  let storageDriver;
   if (config.storage.type === "file") {
-    originalPhotoDriver = fsDriver({
-      base: `${config.storage.file.base}/photo/original`,
+    storageDriver = fsDriver({
+      base: config.storage.file.base,
     });
   } else if (config.storage.type === "s3") {
     if (
@@ -20,7 +20,7 @@ export default defineNitroPlugin(() => {
       throw createError("Incomplete S3 configuration");
     }
 
-    originalPhotoDriver = s3Driver({
+    storageDriver = s3Driver({
       accessKeyId: config.storage.s3.accessKey,
       secretAccessKey: config.storage.s3.secretKey,
       endpoint: config.storage.s3.endpoint,
@@ -31,10 +31,10 @@ export default defineNitroPlugin(() => {
     throw createError("Unsupported storage type");
   }
 
-  const thumbPhotoDriver = lruCacheDriver({
+  const tempDriver = lruCacheDriver({
     max: Number(config.storage.thumb.cacheMax) || 1000,
   });
 
-  storage.mount("photo:original", originalPhotoDriver);
-  storage.mount("photo:thumb", thumbPhotoDriver);
+  storage.mount("storage", storageDriver);
+  storage.mount("temp", tempDriver);
 });

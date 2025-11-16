@@ -59,6 +59,14 @@ export default defineNuxtConfig({
     },
   },
 
+  vite: {
+    build: {
+      rollupOptions: {
+        external: ["sharp"],
+      },
+    },
+  },
+
   eslint: {
     config: {
       stylistic: {

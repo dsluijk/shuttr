@@ -62,7 +62,7 @@ if (!album.value) {
   throw createError({ statusCode: 404, statusMessage: "Album Not Found" });
 }
 
-const limit = pLimit(4);
+const limit = pLimit(2);
 const files = ref([]);
 const uploaded = ref(0);
 
