@@ -10,7 +10,7 @@ export default defineEventHandler(async (event) => {
   };
 
   const db = useDrizzle();
-  return await db.query.album.findFirst({
+  const album = await db.query.album.findFirst({
     where: (album, { and, eq, or }) =>
       and(
         eq(album.slug, slug),
@@ -33,6 +33,13 @@ export default defineEventHandler(async (event) => {
       },
     },
   });
+
+  if (!album) {
+    throw createError({
+      statusCode: 404,
+      statusMessage: "Album not found",
+    });
+  }
 });
 
 const paramSchema = z.object({
