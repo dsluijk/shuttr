@@ -6,10 +6,11 @@
     />
 
     <UPageBody class="mt-0">
-      <UPageColumns v-if="album.photos.length > 0">
+      <UPageGrid v-if="album.photos.length > 0">
         <Motion
           v-for="(photo, index) in album.photos"
-          :key="index"
+          as-child
+          :key="photo.id"
           :initial="{
             scale: 1.1,
             opacity: 0,
@@ -34,13 +35,11 @@
           <UnLazyImage
             :src="`/photo/${album.id}/${photo.id}/thumb`"
             :thumbhash="photo.thumbHash"
-            :width="photo.width"
-            :height="photo.height"
-            :style="`aspect-ratio: ${photo.width}/${photo.height};`"
-            class="rounded-lg"
+            :style="`aspect-ratio: 4/${3 * getAspectRows(photo)}; grid-row: span ${getAspectRows(photo)};`"
+            :class="`h-full w-full object-cover rounded-lg`"
           />
         </Motion>
-      </UPageColumns>
+      </UPageGrid>
 
       <UEmpty
         v-else
@@ -61,4 +60,8 @@ const { data: album } = await useFetch(`/api/albums/${route.params.slug}`);
 if (!album.value) {
   throw createError({ statusCode: 404, statusMessage: "Album Not Found" });
 }
+
+const getAspectRows = (photo: typeof album.photos) => {
+  return Math.round(Math.max(photo.height / photo.width, 1));
+};
 </script>
