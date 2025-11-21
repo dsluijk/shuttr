@@ -23,8 +23,16 @@ export default defineEventHandler(async (event) => {
   let photosDeleted = 0;
 
   for (const photo of album.photos) {
-    await storage.remove(`storage:photo:${album.id}:${photo.id}:large`);
-    await storage.remove(`storage:photo:${album.id}:${photo.id}:original`);
+    for (const storageKey of [
+      `storage:photo:${album.id}:${photo.id}:large`,
+      `storage:photo:${album.id}:${photo.id}:original`,
+    ]) {
+      if (!(await storage.has(storageKey))) {
+        continue;
+      }
+
+      await storage.remove(storageKey);
+    }
 
     await db.delete(tables.photo).where(eq(tables.photo.id, photo.id));
     photosDeleted++;
