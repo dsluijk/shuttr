@@ -79,9 +79,9 @@
 </template>
 
 <script setup lang="ts">
-import { createAlbum } from "~~/shared/utils/abilities";
+import { createAlbums } from "~~/shared/utils/abilities";
 
-await authorize(createAlbum);
+await authorize(createAlbums);
 
 const toast = useToast();
 const { resolve } = useRouter();
@@ -155,7 +155,6 @@ const editAlbumItems = (row) => [
       icon: "i-lucide-x",
       color: "error",
       variant: "solid",
-      disabled: true,
       onClick: () => deleteAlbum(row),
     },
   ],
@@ -172,11 +171,15 @@ const copyLink = (row) => {
   });
 };
 
-const deleteAlbum = (row) => {
-  // TODO: actually delete the album.
+const deleteAlbum = async (row) => {
+  const slug = row.getValue("slug");
+  const { deletedPhotos } = await useRequestFetch()(`/api/albums/${slug}`, {
+    method: "DELETE",
+  });
+
   toast.add({
     title: "Album deleted",
-    description: `The album "${row.getValue("title")}" has been deleted.`,
+    description: `The album "${row.getValue("title")}" with ${deletedPhotos} photos has been deleted.`,
     icon: "i-lucide-x",
     color: "success",
   });
