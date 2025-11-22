@@ -4,6 +4,10 @@
       title="Shuttr Photo Gallery"
       description="Shuttr is a simple to use self-hosted photo gallery for amateurs."
     >
+      <div
+        class="rounded-lg w-full lg:h-[450px] h-[350px] bg-radial-[at_60%_60%] from-neutral-300 to-neutral-100 dark:from-neutral-800 dark:to-neutral-700"
+      />
+
       <template #links>
         <div class="gap-x-4 inline-flex">
           <Motion
@@ -109,7 +113,14 @@
             variant="ghost"
           >
             <template #header>
+              <UnLazyImage
+                v-if="album.cover"
+                :src="`/photo/${album.id}/${album.cover.id}/thumb`"
+                :thumbhash="album.cover.thumbHash"
+                :class="`h-full w-full object-cover`"
+              />
               <div
+                v-else
                 class="rounded-lg w-full h-full bg-radial-[at_60%_60%] from-neutral-300 to-neutral-100 dark:from-neutral-800 dark:to-neutral-700"
               />
             </template>

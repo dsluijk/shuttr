@@ -7,6 +7,7 @@ export default defineEventHandler(async (event) => {
   const album = await db.query.album.findFirst({
     where: (album, { eq }) => eq(album.slug, slug),
     with: {
+      cover: true,
       photos: {
         orderBy: (photo, { asc }) => [asc(photo.dateTime)],
       },

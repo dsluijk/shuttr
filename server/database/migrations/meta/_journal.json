@@ -43,6 +43,13 @@
       "when": 1762699702252,
       "tag": "0005_keycloak-auth",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1763812464716,
+      "tag": "0006_coverPhoto",
+      "breakpoints": true
     }
   ]
 }

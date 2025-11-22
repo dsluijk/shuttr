@@ -18,17 +18,7 @@
           delay: 0.05,
         }"
       >
-        <NuxtImg
-          v-if="image"
-          :src="image"
-          :alt="title"
-          class="rounded-lg w-full lg:h-[350px] h-[250px] object-cover object-center"
-        />
-
-        <div
-          v-else
-          class="rounded-lg w-full lg:h-[350px] h-[250px] bg-radial-[at_60%_60%] from-neutral-300 to-neutral-100 dark:from-neutral-800 dark:to-neutral-700"
-        />
+        <slot />
       </Motion>
     </template>
 

@@ -32,6 +32,7 @@ export const album = pgTable(
     slug: varchar({ length: 128 }).notNull().unique(),
     title: varchar({ length: 64 }).notNull().unique(),
     description: varchar({ length: 512 }).notNull(),
+    coverPhoto: cuid2(),
     // Control the visibility of the album on the main page.
     visibility: albumVisibilityColumn().notNull(),
     // Whenether it's allowed to share the URL of the album.
@@ -42,6 +43,7 @@ export const album = pgTable(
   (t) => [index().on(t.slug)],
 );
 
-export const albumRelations = relations(album, ({ many }) => ({
+export const albumRelations = relations(album, ({ many, one }) => ({
   photos: many(photo),
+  cover: one(photo, { fields: [album.coverPhoto], references: [photo.id] }),
 }));

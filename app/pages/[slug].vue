@@ -3,7 +3,18 @@
     <AnimatedHero
       :title="album.title"
       :description="album.description"
-    />
+    >
+      <UnLazyImage
+        v-if="album.cover"
+        :src="`/photo/${album.id}/${album.cover.id}/large`"
+        :thumbhash="album.cover.thumbHash"
+        class="w-full lg:h-[450px] h-[350px] rounded-lg object-cover object-center"
+      />
+      <div
+        v-else
+        class="rounded-lg w-full lg:h-[450px] h-[350px] bg-radial-[at_60%_60%] from-neutral-300 to-neutral-100 dark:from-neutral-800 dark:to-neutral-700"
+      />
+    </AnimatedHero>
 
     <UPageBody class="mt-0">
       <UPageGrid v-if="album.photos.length > 0">
