@@ -112,7 +112,6 @@
                   icon="i-lucide-trash"
                   class="rounded-t-none"
                   block
-                  disabled
                 />
               </UFieldGroup>
             </template>
@@ -153,7 +152,7 @@ const files = ref([]);
 const uploaded = ref(0);
 
 const uploadFile = async (file: File) => {
-  const uploadedPhoto = await $fetch(`/api/albums/${album.value.slug}/upload`, {
+  const uploadedPhoto = await $fetch(`/api/albums/${album.value.slug}/photo`, {
     method: "POST",
     retry: 3,
     headers: {
@@ -189,7 +188,19 @@ const setCoverPhoto = async (photo) => {
   });
 };
 
-const deletePhoto = (photo) => {
-  console.log(photo);
+const deletePhoto = async (photo) => {
+  await $fetch(`/api/albums/${album.value.slug}/photo/${photo.id}`, {
+    method: "DELETE",
+  });
+
+  album.value.photos = album.value.photos.filter(
+    (albumPhoto) => albumPhoto.id !== photo.id,
+  );
+  toast.add({
+    title: "Photo Deleted",
+    description: "The selected photo has been deleted.",
+    icon: "i-lucide-thras",
+    color: "error",
+  });
 };
 </script>
