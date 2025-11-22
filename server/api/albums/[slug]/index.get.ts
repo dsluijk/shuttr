@@ -13,7 +13,7 @@ export default defineEventHandler(async (event) => {
     },
   });
 
-  if (!album || !(await allows(event, viewAlbum, album))) {
+  if (!album || !(await allows(event, viewAlbum, album, true))) {
     throw createError({
       statusCode: 404,
       statusMessage: "Album not found",
