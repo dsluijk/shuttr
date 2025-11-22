@@ -17,3 +17,12 @@
     </UPageBody>
   </div>
 </template>
+
+<script setup lang="ts">
+useSeoMeta({
+  title: "Manage Settings",
+  ogTitle: "Manage Settings",
+  description: "Manage photo gallery settings",
+  ogDescription: "Manage photo gallery settings",
+});
+</script>

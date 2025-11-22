@@ -56,6 +56,13 @@ import type { TableColumn } from "@nuxt/ui";
 
 import { listUsers } from "~~/shared/utils/abilities";
 
+useSeoMeta({
+  title: "Manage Users",
+  ogTitle: "Manage Users",
+  description: "Manage photo gallery users",
+  ogDescription: "Manage photo gallery users",
+});
+
 await authorize(listUsers);
 
 const { data, status } = await useFetch("/api/users");

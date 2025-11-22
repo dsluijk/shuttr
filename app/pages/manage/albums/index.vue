@@ -81,6 +81,13 @@
 <script setup lang="ts">
 import { createAlbums } from "~~/shared/utils/abilities";
 
+useSeoMeta({
+  title: "Manage Albums",
+  ogTitle: "Manage Albums",
+  description: "Manage photo gallery albums",
+  ogDescription: "Manage photo gallery albums",
+});
+
 await authorize(createAlbums);
 
 const toast = useToast();

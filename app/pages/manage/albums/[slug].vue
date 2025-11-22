@@ -62,6 +62,13 @@ if (!album.value) {
   throw createError({ statusCode: 404, statusMessage: "Album Not Found" });
 }
 
+useSeoMeta({
+  title: `Manage "${album.value.title}"`,
+  ogTitle: `Manage "${album.value.title}"`,
+  description: "Manage photo album",
+  ogDescription: "Manage photo album",
+});
+
 const limit = pLimit(2);
 const files = ref([]);
 const uploaded = ref(0);

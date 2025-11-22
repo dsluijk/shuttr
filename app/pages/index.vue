@@ -157,4 +157,12 @@
 
 <script setup lang="ts">
 const { data: albums } = await useFetch("/api/albums");
+
+useSeoMeta({
+  titleTemplate: "",
+  title: "Shuttr",
+  ogTitle: "Shuttr",
+  description: "Shuttr Photo Gallery",
+  ogDescription: "Shuttr Photo Gallery",
+});
 </script>

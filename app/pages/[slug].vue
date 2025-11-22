@@ -61,6 +61,13 @@ if (!album.value) {
   throw createError({ statusCode: 404, statusMessage: "Album Not Found" });
 }
 
+useSeoMeta({
+  title: album.value.title,
+  ogTitle: album.value.title,
+  description: album.value.description,
+  ogDescription: album.value.description,
+});
+
 const getAspectRows = (photo: typeof album.photos) => {
   return Math.round(Math.max(photo.height / photo.width, 1));
 };
