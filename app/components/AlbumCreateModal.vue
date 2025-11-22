@@ -125,11 +125,11 @@ const createAlbum = async (event: FormSubmitEvent<Schema>) => {
 
   toast.add({
     title: "Album created",
-    description: `Your album "${createdAlbum.title}" has been created.`,
+    description: `Your album "${createdAlbum?.title}" has been created.`,
     icon: "i-lucide-folder-plus",
     color: "success",
   });
 
-  await navigateTo(`/manage/albums/${createdAlbum.slug}`);
+  await navigateTo(`/manage/albums/${createdAlbum?.slug}`);
 };
 </script>

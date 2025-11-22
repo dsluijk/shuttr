@@ -23,7 +23,11 @@
         >
           <template #sharingAllowed-cell="{ row }">
             <UBadge
-              v-bind="sharingProps[row.getValue('sharingAllowed')]"
+              v-bind="
+                sharingProps[
+                  row.getValue('sharingAllowed') as keyof typeof sharingProps
+                ]
+              "
               class="capitalize"
               variant="subtle"
             >
@@ -33,7 +37,11 @@
 
           <template #visibility-cell="{ row }">
             <UBadge
-              v-bind="visibilityProps[row.getValue('visibility')]"
+              v-bind="
+                visibilityProps[
+                  row.getValue('visibility') as keyof typeof visibilityProps
+                ]
+              "
               class="capitalize"
               variant="subtle"
             >
@@ -79,6 +87,7 @@
 </template>
 
 <script setup lang="ts">
+import type { TableColumn, TableRow } from "@nuxt/ui";
 import { editAlbums } from "~~/shared/utils/abilities";
 
 useSeoMeta({
@@ -96,23 +105,24 @@ const { copy } = useClipboard();
 const { origin } = useRequestURL();
 
 const { data: albums, status } = await useFetch("/api/albums");
+type AlbumData = NonNullable<typeof albums.value>[number];
 
-const sharingProps = ref({
+const sharingProps = {
   true: { color: "success", icon: "i-lucide-check" } as const,
   false: { color: "error", icon: "i-lucide-x" } as const,
-});
+} as const;
 
-const visibilityProps = ref({
+const visibilityProps = {
   public: { color: "info" } as const,
   authenticated: { color: "warning" } as const,
   private: { color: "error" } as const,
-});
+} as const;
 
 const columnVisibility = ref({
   slug: false,
 });
 
-const columns: TableColumn<typeof albums>[] = computed(() => [
+const columns: TableColumn<AlbumData>[] = [
   {
     accessorKey: "slug",
     header: "Slug",
@@ -136,9 +146,9 @@ const columns: TableColumn<typeof albums>[] = computed(() => [
   {
     id: "actions",
   },
-]);
+];
 
-const editAlbumItems = (row) => [
+const editAlbumItems = (row: TableRow<AlbumData>) => [
   [
     {
       label: "View",
@@ -167,7 +177,7 @@ const editAlbumItems = (row) => [
   ],
 ];
 
-const copyLink = (row) => {
+const copyLink = (row: TableRow<AlbumData>) => {
   const slug = row.getValue("slug");
   copy(new URL(resolve(`/${slug}`).href, origin).href);
 
@@ -178,7 +188,9 @@ const copyLink = (row) => {
   });
 };
 
-const deleteAlbum = async (row) => {
+const deleteAlbum = async (row: TableRow<AlbumData>) => {
+  if (!albums.value) return;
+
   const slug = row.getValue("slug");
   const { deletedPhotos } = await useRequestFetch()(`/api/albums/${slug}`, {
     method: "DELETE",

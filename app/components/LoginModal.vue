@@ -34,7 +34,7 @@ const open = ref(false);
 
 const { data: authData } = await useFetch("/api/auth");
 const providers = computed(() =>
-  Object.entries(authData.value)
+  Object.entries(authData.value ?? {})
     .map(([name, data]) => ({ ...data, name }))
     .filter((method) => method.active)
     .map((method) => ({
@@ -46,7 +46,7 @@ const providers = computed(() =>
 );
 
 const quickOpen = async () => {
-  if (providers.value.length === 1) {
+  if (providers.value !== undefined && providers.value[0] !== undefined) {
     // There is only one provider, so we will start the flow immediately.
     await navigateTo(providers.value[0].to, { external: true });
   } else {

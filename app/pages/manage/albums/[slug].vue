@@ -41,7 +41,7 @@
           >
             <UProgress
               v-model="uploaded"
-              :max="uploadFiles.length"
+              :max="uploadFiles?.length"
               size="lg"
               status
             />
@@ -54,7 +54,7 @@
         class="lg:gap-y-4"
       >
         <Motion
-          v-for="(photo, index) of album.photos"
+          v-for="photo of album.photos"
           :key="photo.id"
           :initial="{
             scale: 1.1,
@@ -98,20 +98,20 @@
             <template #body>
               <UFieldGroup class="w-full">
                 <UButton
-                  @click="() => setCoverPhoto(photo)"
                   color="neutral"
                   variant="ghost"
                   icon="i-lucide-spotlight"
                   class="rounded-t-none"
                   block
+                  @click="() => setCoverPhoto(photo.id)"
                 />
                 <UButton
-                  @click="() => deletePhoto(photo)"
                   color="error"
                   variant="ghost"
                   icon="i-lucide-trash"
                   class="rounded-t-none"
                   block
+                  @click="() => deletePhoto(photo.id)"
                 />
               </UFieldGroup>
             </template>
@@ -130,10 +130,6 @@ const toast = useToast();
 
 const { data: album } = await useFetch(`/api/albums/${route.params.slug}`, {
   deep: true,
-  default: () => ({
-    cover: null,
-    photos: [],
-  }),
 });
 
 if (!album.value) {
@@ -152,6 +148,8 @@ const files = ref([]);
 const uploaded = ref(0);
 
 const uploadFile = async (file: File) => {
+  if (!album.value) return;
+
   const uploadedPhoto = await $fetch(`/api/albums/${album.value.slug}/photo`, {
     method: "POST",
     retry: 3,
@@ -161,25 +159,29 @@ const uploadFile = async (file: File) => {
     body: await file.bytes(),
   });
 
-  album.value.photos.unshift(uploadedPhoto);
-  uploaded.value++;
+  if (uploadedPhoto) {
+    album.value.photos.unshift(uploadedPhoto);
+    uploaded.value++;
+  }
 };
 
-watchArray(files, (newFiles, oldFiles, added) => {
+watchArray(files, (_newFiles, _oldFiles, added) => {
   for (const newFile of added) {
     limit(() => uploadFile(newFile));
   }
 });
 
-const setCoverPhoto = async (photo) => {
-  await $fetch(`/api/albums/${album.value.slug}/cover`, {
+const setCoverPhoto = async (photoId: string) => {
+  if (!album.value) return;
+
+  const newCover = await $fetch(`/api/albums/${album.value.slug}/cover`, {
     method: "PUT",
     body: {
-      photoId: photo.id,
+      photoId: photoId,
     },
   });
 
-  album.value.cover = photo;
+  album.value.cover = newCover;
   toast.add({
     title: "Photo Highlighted",
     description: "The selected photo has been set as the cover.",
@@ -188,13 +190,15 @@ const setCoverPhoto = async (photo) => {
   });
 };
 
-const deletePhoto = async (photo) => {
-  await $fetch(`/api/albums/${album.value.slug}/photo/${photo.id}`, {
+const deletePhoto = async (photoId: string) => {
+  if (!album.value) return;
+
+  await $fetch(`/api/albums/${album.value.slug}/photo/${photoId}`, {
     method: "DELETE",
   });
 
   album.value.photos = album.value.photos.filter(
-    (albumPhoto) => albumPhoto.id !== photo.id,
+    (albumPhoto) => albumPhoto.id !== photoId,
   );
   toast.add({
     title: "Photo Deleted",

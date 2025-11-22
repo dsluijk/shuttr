@@ -15,8 +15,7 @@
     <UPageBody class="mt-0">
       <UPageGrid v-if="album.photos.length > 0">
         <Motion
-          v-for="(photo, index) in album.photos"
-          as-child
+          v-for="photo of album.photos"
           :key="photo.id"
           :initial="{
             scale: 1.1,
@@ -38,6 +37,7 @@
             delay: 0.15,
           }"
           :inViewOptions="{ once: true }"
+          asChild
         >
           <PhotoModal :photo="photo">
             <UnLazyImage
@@ -77,7 +77,7 @@ useSeoMeta({
   ogDescription: album.value.description,
 });
 
-const getAspectRows = (photo: typeof album.photos) => {
+const getAspectRows = (photo: (typeof album.value.photos)[number]) => {
   return Math.round(Math.max(photo.height / photo.width, 1));
 };
 </script>

@@ -128,7 +128,7 @@ export default defineEventHandler(async (event) => {
     })
     .returning();
 
-  if (result.length !== 1) {
+  if (result.length !== 1 || result[0] === undefined) {
     throw createError({
       statusCode: 500,
       message: "Failed to insert photo metadata",

@@ -34,16 +34,15 @@ export const handleOAuthCallback = async (
     with: { user: true },
   });
 
-  if (!provider) {
+  if (provider === undefined) {
     // The user provider does not exists.
     // Either the user does not exists, or the user has not logged in with this provider.
     let user = await db.query.user.findFirst({
       where: (t, { and, eq }) => and(eq(t.email, oauthUser.email)),
     });
 
-    if (!user) {
+    if (user === undefined) {
       // Create the user as it does not exists.
-
       const userCreateResult = await db
         .insert(tables.user)
         .values({
@@ -53,7 +52,7 @@ export const handleOAuthCallback = async (
         })
         .returning();
 
-      if (userCreateResult.length !== 1) {
+      if (userCreateResult.length !== 1 || userCreateResult[0] === undefined) {
         throw createError({
           statusCode: 500,
           message: "The user account cannot be created.",
@@ -83,7 +82,7 @@ export const handleOAuthCallback = async (
     provider = {
       ...providerCreateResult[0],
       user,
-    };
+    } as NonNullable<typeof provider>;
   }
 
   // Update last seen for the user provider.

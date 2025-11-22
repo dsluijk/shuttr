@@ -6,7 +6,7 @@
       icon="i-lucide-users"
     />
 
-    <UPageBody>
+    <UPageBody v-if="data !== undefined && providerData !== undefined">
       <UPageCard
         variant="subtle"
         class="overflow-x-auto"
@@ -18,7 +18,7 @@
         >
           <template #role-cell="{ row }">
             <UBadge
-              v-bind="roleProps[row.getValue('role')]"
+              v-bind="roleProps[row.getValue('role') as keyof typeof roleProps]"
               class="capitalize"
               variant="subtle"
             >
@@ -28,19 +28,17 @@
 
           <template #providers-cell="{ row }">
             <UTooltip
-              v-for="(provider, _index) of row
-                .getValue('providers')
-                .filter(
-                  (provider) => providerData[provider['provider']].active,
-                )"
+              v-for="provider of mapProviders(row)"
               :key="provider.id"
-              :text="providerData[provider['provider']].displayName"
+              :text="provider.providerData?.displayName"
               :delayDuration="0"
               class="size-4 mr-2"
             >
               <UIcon
                 :name="`i-simple-icons-${
-                  providerData[provider['provider']].icon
+                  providerData[
+                    provider['provider'] as keyof typeof providerData
+                  ].icon
                 }`"
               />
             </UTooltip>
@@ -52,7 +50,7 @@
 </template>
 
 <script setup lang="ts">
-import type { TableColumn } from "@nuxt/ui";
+import type { TableColumn, TableRow } from "@nuxt/ui";
 
 import { listUsers } from "~~/shared/utils/abilities";
 
@@ -67,14 +65,15 @@ await authorize(listUsers);
 
 const { data, status } = await useFetch("/api/users");
 const { data: providerData } = await useFetch("/api/auth");
+type UserData = NonNullable<typeof data.value>[number];
 
-const roleProps = ref({
+const roleProps = {
   user: { color: "info" } as const,
   publisher: { color: "warning" } as const,
   admin: { color: "error" } as const,
-});
+} as const;
 
-const columns: TableColumn<typeof data>[] = computed(() => [
+const columns: TableColumn<UserData>[] = [
   {
     accessorKey: "name",
     header: "Name",
@@ -91,5 +90,15 @@ const columns: TableColumn<typeof data>[] = computed(() => [
     accessorKey: "providers",
     header: "Providers",
   },
-]);
+];
+
+const mapProviders = (row: TableRow<UserData>) => {
+  const providers = row.getValue("providers") as UserData["providers"];
+  return providers
+    .map((provider) => ({
+      ...provider,
+      providerData: providerData.value && providerData.value[provider.provider],
+    }))
+    .filter((provider) => provider.providerData?.active);
+};
 </script>

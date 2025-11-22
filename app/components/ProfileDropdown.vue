@@ -31,7 +31,7 @@ import type { User } from "#auth-utils";
 import { listUsers, editAlbums } from "~~/shared/utils/abilities";
 
 const props = defineProps<{
-  user: User;
+  user: User | null;
   clear: () => void;
 }>();
 
@@ -85,7 +85,7 @@ const items = computed<DropdownMenuItem[][]>(() =>
       },
     ],
   ]
-    .map((part) => part.filter((row) => row.show === undefined || row.show))
+    .map((part) => part.filter((row) => !("show" in row) || !!row.show))
     .filter((part) => part.length > 0),
 );
 </script>

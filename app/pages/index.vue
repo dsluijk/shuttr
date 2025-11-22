@@ -109,7 +109,7 @@
           <UBlogPost
             :title="album.title"
             :date="album.createdAt"
-            :to="computed(() => `/${album.slug}`)"
+            :to="`/${album.slug}`"
             variant="ghost"
             :ui="{
               header: 'aspect-[4/3]',

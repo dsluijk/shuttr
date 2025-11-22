@@ -2,7 +2,7 @@ import type { User } from "#auth-utils";
 import { allow, defineAbility, deny } from "#imports";
 import { UserRole } from "~~/server/database/schema/user";
 import {
-  album as albumSchema,
+  type album as albumSchema,
   AlbumVisibility,
 } from "~~/server/database/schema/album";
 

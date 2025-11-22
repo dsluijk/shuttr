@@ -14,7 +14,10 @@
 </template>
 
 <script setup lang="ts">
+import type { photo as Photo } from "~~/server/database/schema";
+import type { SerializeObject } from "nitropack";
+
 defineProps<{
-  photo: object;
+  photo: SerializeObject<typeof Photo.$inferSelect>;
 }>();
 </script>

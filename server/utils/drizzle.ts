@@ -6,7 +6,7 @@ let db: ReturnType<typeof drizzle<typeof schema>> | null;
 
 export function useDrizzle() {
   if (!db) {
-    let connection = {
+    const connection = {
       host: process.env.DATABASE_HOST || "localhost",
       port: Number(process.env.DATABASE_HOST) || 5432,
       user: process.env.DATABASE_USER || undefined,

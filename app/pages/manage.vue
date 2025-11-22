@@ -19,12 +19,13 @@
 </template>
 
 <script setup lang="ts">
+import type { NavigationMenuItem } from "@nuxt/ui";
 import { listUsers, editAlbums } from "~~/shared/utils/abilities";
 
 const canListUsers = await allows(listUsers);
 const canEditAlbums = await allows(editAlbums);
 
-const items = computed<DropdownMenuItem[][]>(() =>
+const items = computed<NavigationMenuItem[]>(() =>
   [
     {
       label: "Albums",
