@@ -7,9 +7,16 @@ export default defineEventHandler(async (event) => {
   const album = await db.query.album.findFirst({
     where: (album, { eq }) => eq(album.slug, slug),
     with: {
-      cover: true,
+      cover: {
+        columns: {
+          location: false,
+        },
+      },
       photos: {
         orderBy: (photo, { asc }) => [asc(photo.dateTime)],
+        columns: {
+          location: false,
+        },
       },
     },
   });

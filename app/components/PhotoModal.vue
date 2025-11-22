@@ -18,6 +18,6 @@ import type { photo as Photo } from "~~/server/database/schema";
 import type { SerializeObject } from "nitropack";
 
 defineProps<{
-  photo: SerializeObject<typeof Photo.$inferSelect>;
+  photo: SerializeObject<Omit<typeof Photo.$inferSelect, "location">>;
 }>();
 </script>

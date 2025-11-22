@@ -10,7 +10,13 @@ export default defineEventHandler(async (event) => {
   const db = useDrizzle();
   return await db.query.album.findMany({
     orderBy: (album, { desc }) => [desc(album.createdAt)],
-    with: { cover: true },
+    with: {
+      cover: {
+        columns: {
+          location: false,
+        },
+      },
+    },
     where: (album, { eq, or }) =>
       or(
         accessLevels.public

@@ -22,6 +22,9 @@ export default defineEventHandler(async (event) => {
 
   const photo = await db.query.photo.findFirst({
     where: (photo, { eq }) => eq(photo.id, photoId),
+    columns: {
+      location: false,
+    },
   });
 
   if (!photo) {

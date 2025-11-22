@@ -45,6 +45,9 @@ export default defineEventHandler(async (event) => {
   const existingPhotos = await db.query.photo.findMany({
     where: (photo, { and, eq }) =>
       and(eq(photo.album, album.id), eq(photo.originalDigest, originalDigest)),
+    columns: {
+      location: false,
+    },
   });
   if (existingPhotos.length > 0) {
     throw createError({
