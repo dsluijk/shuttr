@@ -1,20 +1,3 @@
-<script setup lang="ts">
-import type { NuxtError } from "#app";
-
-defineProps({
-  error: {
-    type: Object as PropType<NuxtError>,
-    required: true,
-  },
-});
-
-useHead({
-  htmlAttrs: {
-    lang: "en",
-  },
-});
-</script>
-
 <template>
   <UApp>
     <AppHeader />
@@ -30,3 +13,27 @@ useHead({
     <AppFooter />
   </UApp>
 </template>
+
+<script setup lang="ts">
+import type { NuxtError } from "#app";
+
+const props = defineProps({
+  error: {
+    type: Object as PropType<NuxtError>,
+    required: true,
+  },
+});
+
+useHead({
+  htmlAttrs: {
+    lang: "en",
+  },
+});
+
+useSeoMeta({
+  title: props.error.message,
+  ogTitle: props.error.message,
+  description: `Error - ${props.error.message}`,
+  ogDescription: `Error - ${props.error.message}`,
+});
+</script>
