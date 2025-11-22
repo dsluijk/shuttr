@@ -48,6 +48,78 @@
           </UPageCard>
         </template>
       </UFileUpload>
+
+      <UBlogPosts
+        v-if="album.photos.length > 0"
+        class="lg:gap-y-4"
+      >
+        <Motion
+          v-for="(photo, index) of album.photos"
+          :key="photo.id"
+          :initial="{
+            scale: 1.1,
+            opacity: 0,
+            filter: 'blur(20px)',
+            transform: 'translateY(10px)',
+          }"
+          :animate="{
+            scale: 1.08,
+            opacity: 0.2,
+            filter: 'blur(10px)',
+            transform: 'translateY(10px)',
+          }"
+          :whileInView="{
+            scale: 1,
+            opacity: 1,
+            filter: 'blur(0px)',
+            transform: 'translateY(0)',
+          }"
+          :transition="{
+            duration: 0.3,
+            delay: 0.1,
+          }"
+          :inViewOptions="{ once: true }"
+        >
+          <UBlogPost
+            :ui="{
+              root: 'rounded-md',
+              header: 'aspect-[4/3]',
+              body: 'p-0 sm:p-0',
+            }"
+          >
+            <template #header>
+              <UnLazyImage
+                :src="`/photo/${album.id}/${photo.id}/thumb`"
+                :thumbhash="photo.thumbHash"
+                :class="`h-full w-full object-cover`"
+              />
+            </template>
+
+            <template #body>
+              <UFieldGroup class="w-full">
+                <UButton
+                  @click="() => highlightPhoto(photo)"
+                  color="neutral"
+                  variant="ghost"
+                  icon="i-lucide-spotlight"
+                  class="rounded-t-none"
+                  block
+                  disabled
+                />
+                <UButton
+                  @click="() => deletePhoto(photo)"
+                  color="error"
+                  variant="ghost"
+                  icon="i-lucide-trash"
+                  class="rounded-t-none"
+                  block
+                  disabled
+                />
+              </UFieldGroup>
+            </template>
+          </UBlogPost>
+        </Motion>
+      </UBlogPosts>
     </UPageBody>
   </div>
 </template>
@@ -56,7 +128,12 @@
 import pLimit from "p-limit";
 
 const route = useRoute();
-const { data: album } = await useFetch(`/api/albums/${route.params.slug}`);
+const { data: album } = await useFetch(`/api/albums/${route.params.slug}`, {
+  deep: true,
+  default: () => ({
+    photos: [],
+  }),
+});
 
 if (!album.value) {
   throw createError({ statusCode: 404, statusMessage: "Album Not Found" });
@@ -74,7 +151,7 @@ const files = ref([]);
 const uploaded = ref(0);
 
 const uploadFile = async (file: File) => {
-  await $fetch(`/api/albums/${album.value.slug}/upload`, {
+  const uploadedPhoto = await $fetch(`/api/albums/${album.value.slug}/upload`, {
     method: "POST",
     retry: 3,
     headers: {
@@ -83,6 +160,7 @@ const uploadFile = async (file: File) => {
     body: await file.bytes(),
   });
 
+  album.value.photos.unshift(uploadedPhoto);
   uploaded.value++;
 };
 
@@ -91,4 +169,12 @@ watchArray(files, (newFiles, oldFiles, added) => {
     limit(() => uploadFile(newFile));
   }
 });
+
+const highlightPhoto = (photo) => {
+  console.log(photo);
+};
+
+const deletePhoto = (photo) => {
+  console.log(photo);
+};
 </script>
