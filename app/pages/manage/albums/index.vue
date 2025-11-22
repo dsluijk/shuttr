@@ -184,6 +184,7 @@ const deleteAlbum = async (row) => {
     method: "DELETE",
   });
 
+  albums.value = albums.value.filter((album) => album.slug !== slug);
   toast.add({
     title: "Album deleted",
     description: `The album "${row.getValue("title")}" with ${deletedPhotos} photos has been deleted.`,
