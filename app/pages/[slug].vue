@@ -39,12 +39,14 @@
           }"
           :inViewOptions="{ once: true }"
         >
-          <UnLazyImage
-            :src="`/photo/${album.id}/${photo.id}/thumb`"
-            :thumbhash="photo.thumbHash"
-            :style="`aspect-ratio: 4/${3 * getAspectRows(photo)}; grid-row: span ${getAspectRows(photo)};`"
-            :class="`h-full w-full object-cover rounded-lg`"
-          />
+          <PhotoModal :photo="photo">
+            <UnLazyImage
+              :src="`/photo/${album.id}/${photo.id}/thumb`"
+              :thumbhash="photo.thumbHash"
+              :style="`aspect-ratio: 4/${3 * getAspectRows(photo)}; grid-row: span ${getAspectRows(photo)};`"
+              :class="`h-full w-full object-cover rounded-lg`"
+            />
+          </PhotoModal>
         </Motion>
       </UPageGrid>
 
