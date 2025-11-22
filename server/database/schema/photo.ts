@@ -14,7 +14,7 @@ import { album } from "./album";
 import { relations } from "drizzle-orm";
 
 export enum PhotoType {
-  JPEG = "JPEG",
+  jpeg = "jpeg",
 }
 
 export const photoTypeColumn = pgEnum("photo_type", enumToPgEnum(PhotoType));
