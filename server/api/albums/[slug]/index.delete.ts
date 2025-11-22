@@ -9,7 +9,13 @@ export default defineEventHandler(async (event) => {
 
   const album = await db.query.album.findFirst({
     where: (album, { eq }) => eq(album.slug, slug),
-    with: { photos: true },
+    with: {
+      photos: {
+        columns: {
+          location: false,
+        },
+      },
+    },
   });
 
   if (!album) {

@@ -10,6 +10,9 @@ export default defineEventHandler(async (event) => {
       cover: true,
       photos: {
         orderBy: (photo, { asc }) => [asc(photo.dateTime)],
+        columns: {
+          location: false,
+        },
       },
     },
   });
