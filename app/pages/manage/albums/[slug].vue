@@ -98,13 +98,12 @@
             <template #body>
               <UFieldGroup class="w-full">
                 <UButton
-                  @click="() => highlightPhoto(photo)"
+                  @click="() => setCoverPhoto(photo)"
                   color="neutral"
                   variant="ghost"
                   icon="i-lucide-spotlight"
                   class="rounded-t-none"
                   block
-                  disabled
                 />
                 <UButton
                   @click="() => deletePhoto(photo)"
@@ -128,9 +127,12 @@
 import pLimit from "p-limit";
 
 const route = useRoute();
+const toast = useToast();
+
 const { data: album } = await useFetch(`/api/albums/${route.params.slug}`, {
   deep: true,
   default: () => ({
+    cover: null,
     photos: [],
   }),
 });
@@ -170,8 +172,21 @@ watchArray(files, (newFiles, oldFiles, added) => {
   }
 });
 
-const highlightPhoto = (photo) => {
-  console.log(photo);
+const setCoverPhoto = async (photo) => {
+  await $fetch(`/api/albums/${album.value.slug}/cover`, {
+    method: "PUT",
+    body: {
+      photoId: photo.id,
+    },
+  });
+
+  album.value.cover = photo;
+  toast.add({
+    title: "Photo Highlighted",
+    description: "The selected photo has been set as the cover.",
+    icon: "i-lucide-spotlight",
+    color: "success",
+  });
 };
 
 const deletePhoto = (photo) => {

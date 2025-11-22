@@ -79,7 +79,7 @@
 </template>
 
 <script setup lang="ts">
-import { createAlbums } from "~~/shared/utils/abilities";
+import { editAlbums } from "~~/shared/utils/abilities";
 
 useSeoMeta({
   title: "Manage Albums",
@@ -88,7 +88,7 @@ useSeoMeta({
   ogDescription: "Manage photo gallery albums",
 });
 
-await authorize(createAlbums);
+await authorize(editAlbums);
 
 const toast = useToast();
 const { resolve } = useRouter();

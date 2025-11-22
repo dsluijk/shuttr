@@ -11,7 +11,7 @@ import z from "zod";
 import { PhotoType } from "~~/server/database/schema/photo";
 
 export default defineEventHandler(async (event) => {
-  await authorize(event, uploadPhotos);
+  await authorize(event, editAlbums);
 
   const { slug } = await getValidatedRouterParams(event, paramSchema.parse);
   const db = useDrizzle();

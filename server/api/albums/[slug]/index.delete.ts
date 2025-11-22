@@ -2,7 +2,7 @@ import { eq } from "drizzle-orm";
 import * as z from "zod";
 
 export default defineEventHandler(async (event) => {
-  await authorize(event, deleteAlbums);
+  await authorize(event, editAlbums);
 
   const { slug } = await getValidatedRouterParams(event, paramSchema.parse);
   const db = useDrizzle();

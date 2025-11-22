@@ -19,10 +19,10 @@
 </template>
 
 <script setup lang="ts">
-import { listUsers, createAlbums } from "~~/shared/utils/abilities";
+import { listUsers, editAlbums } from "~~/shared/utils/abilities";
 
 const canListUsers = await allows(listUsers);
-const canCreateAlbums = await allows(createAlbums);
+const canEditAlbums = await allows(editAlbums);
 
 const items = computed<DropdownMenuItem[][]>(() =>
   [
@@ -30,7 +30,7 @@ const items = computed<DropdownMenuItem[][]>(() =>
       label: "Albums",
       icon: "i-lucide-folders",
       to: "/manage/albums",
-      show: canCreateAlbums,
+      show: canEditAlbums,
     },
     {
       label: "Users",

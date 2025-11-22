@@ -111,13 +111,16 @@
             :date="album.createdAt"
             :to="computed(() => `/${album.slug}`)"
             variant="ghost"
+            :ui="{
+              header: 'aspect-[4/3]',
+            }"
           >
             <template #header>
               <UnLazyImage
                 v-if="album.cover"
                 :src="`/photo/${album.id}/${album.cover.id}/thumb`"
                 :thumbhash="album.cover.thumbHash"
-                :class="`h-full w-full object-cover`"
+                class="h-full w-full object-cover"
               />
               <div
                 v-else

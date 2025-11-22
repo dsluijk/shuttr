@@ -4,7 +4,7 @@ import slugify from "slugify";
 import { AlbumVisibility } from "~~/server/database/schema/album";
 
 export default defineEventHandler(async (event) => {
-  await authorize(event, createAlbums);
+  await authorize(event, editAlbums);
 
   const body = await readValidatedBody(event, bodySchema.parse);
   const slug = slugify(body.title, {

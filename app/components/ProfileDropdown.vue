@@ -28,7 +28,7 @@
 import type { DropdownMenuItem } from "@nuxt/ui";
 import type { User } from "#auth-utils";
 
-import { listUsers, createAlbums } from "~~/shared/utils/abilities";
+import { listUsers, editAlbums } from "~~/shared/utils/abilities";
 
 const props = defineProps<{
   user: User;
@@ -49,7 +49,7 @@ const logout = async () => {
 };
 
 const canListUsers = await allows(listUsers);
-const canCreateAlbums = await allows(createAlbums);
+const canEditAlbums = await allows(editAlbums);
 
 const items = computed<DropdownMenuItem[][]>(() =>
   [
@@ -58,7 +58,7 @@ const items = computed<DropdownMenuItem[][]>(() =>
         label: "Albums",
         icon: "i-lucide-folders",
         to: "/manage/albums",
-        show: canCreateAlbums,
+        show: canEditAlbums,
       },
       {
         label: "Users",

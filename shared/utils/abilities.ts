@@ -26,23 +26,7 @@ export const listUsers = defineAbility((user: User) => {
   return deny();
 });
 
-export const createAlbums = defineAbility((user: User) => {
-  if (atLeastRole(UserRole.PUBLISHER, user.role)) {
-    return allow();
-  }
-
-  return deny();
-});
-
-export const deleteAlbums = defineAbility((user: User) => {
-  if (atLeastRole(UserRole.PUBLISHER, user.role)) {
-    return allow();
-  }
-
-  return deny();
-});
-
-export const uploadPhotos = defineAbility((user: User) => {
+export const editAlbums = defineAbility((user: User) => {
   if (atLeastRole(UserRole.PUBLISHER, user.role)) {
     return allow();
   }
