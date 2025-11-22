@@ -27,17 +27,10 @@ export default defineEventHandler(async (event) => {
   }
 
   const original = await readRawBody(event, false);
-  if (!original) {
+  if (original === undefined) {
     throw createError({
       statusCode: 400,
       statusMessage: "No image uploaded",
-    });
-  }
-
-  if (original.byteLength > 50 * 1024 * 1024) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: "Image too large",
     });
   }
 
@@ -56,6 +49,24 @@ export default defineEventHandler(async (event) => {
     });
   }
 
+  const metadata = await sharp(original).metadata();
+  const { width, height } = metadata.autoOrient;
+
+  console.log(metadata.size, original.byteLength);
+  if ((metadata.size ?? original.byteLength) > 50 * 1024 * 1024) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: "Image too large",
+    });
+  }
+
+  if (metadata.format !== "jpeg") {
+    throw createError({
+      statusCode: 400,
+      statusMessage: "Invalid image format",
+    });
+  }
+
   let tags;
   try {
     tags = exifReader.load(original, {
@@ -69,28 +80,9 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const type = readTag(tags.file, "FileType");
-  if (type !== "JPEG") {
-    throw createError({
-      statusCode: 400,
-      statusMessage: "Invalid image format",
-    });
-  }
-
-  const width =
-    Number(readTag(tags.file, "Image Width")?.replace("px", "")) || undefined;
-  const height =
-    Number(readTag(tags.file, "Image Height")?.replace("px", "")) || undefined;
-
-  if (!width || !height) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: "Missing image metadata",
-    });
-  }
-
   const large = await sharp(original)
     .webp()
+    .autoOrient()
     .resize(2000, 2000, { fit: "inside", withoutEnlargement: true })
     .toBuffer();
 
@@ -109,10 +101,10 @@ export default defineEventHandler(async (event) => {
     .insert(tables.photo)
     .values({
       album: album.id,
-      type: PhotoType[type],
+      type: PhotoType[metadata.format],
       originalDigest,
       thumbHash,
-      size: original.byteLength,
+      size: metadata.size ?? original.byteLength,
       width,
       height,
       dateTime,
