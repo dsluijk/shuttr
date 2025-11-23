@@ -108,7 +108,7 @@
         >
           <UBlogPost
             :title="album.title"
-            :date="album.createdAt"
+            :date="album.startDate"
             :to="`/${album.slug}`"
             variant="ghost"
             :ui="{
