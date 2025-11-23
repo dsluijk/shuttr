@@ -1,5 +1,6 @@
 import {
   boolean,
+  date,
   index,
   pgEnum,
   pgTable,
@@ -33,6 +34,8 @@ export const album = pgTable(
     title: varchar({ length: 64 }).notNull().unique(),
     description: varchar({ length: 512 }).notNull(),
     coverPhoto: cuid2(),
+    startDate: date({ mode: "date" }).notNull(),
+    endDate: date({ mode: "date" }).notNull(),
     // Control the visibility of the album on the main page.
     visibility: albumVisibilityColumn().notNull(),
     // Whenether it's allowed to share the URL of the album.

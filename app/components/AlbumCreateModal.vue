@@ -22,6 +22,7 @@
         <UFormField
           label="Title"
           name="title"
+          required
         >
           <UInput
             v-model="state.title"
@@ -35,6 +36,7 @@
         <UFormField
           label="Description"
           name="description"
+          required
         >
           <UTextarea
             v-model="state.description"
@@ -48,8 +50,20 @@
         </UFormField>
 
         <UFormField
+          label="Album Date"
+          name="date"
+          required
+        >
+          <CalendarInput
+            v-model="state.date"
+            :maxValue="maxDate"
+          />
+        </UFormField>
+
+        <UFormField
           label="Visibility"
           name="visibility"
+          required
         >
           <USelect
             v-model="state.visibility"
@@ -86,8 +100,16 @@
 <script setup lang="ts">
 import * as z from "zod";
 import type { FormSubmitEvent } from "@nuxt/ui";
+import { CalendarDate } from "@internationalized/date";
 
 const toast = useToast();
+
+const now = new Date();
+const maxDate = new CalendarDate(
+  now.getFullYear(),
+  now.getMonth() + 1,
+  now.getDate(),
+);
 
 const visibilityOptions = ref([
   { label: "Public", value: "public", icon: "i-lucide-globe" },
@@ -104,20 +126,26 @@ const schema = z.object({
     .string("You must specify a description")
     .min(6, "Must be at least 6 characters")
     .max(512, "Cannot be longer than 512 characters"),
+  date: dateRangeValidator(true),
   visibility: z.enum(visibilityOptions.value.map((opt) => opt.value)),
   sharingAllowed: z.boolean(),
 });
 
-type Schema = z.output<typeof schema>;
+type SchemaIn = z.input<typeof schema>;
+type SchemaOut = z.output<typeof schema>;
 
-const state = reactive<Partial<Schema>>({
+const state = shallowReactive<Partial<SchemaIn>>({
   title: undefined,
   description: undefined,
   visibility: "public",
   sharingAllowed: true,
+  date: {
+    start: undefined,
+    end: undefined,
+  },
 });
 
-const createAlbum = async (event: FormSubmitEvent<Schema>) => {
+const createAlbum = async (event: FormSubmitEvent<SchemaOut>) => {
   const createdAlbum = await useRequestFetch()("/api/albums", {
     method: "POST",
     body: event.data,
