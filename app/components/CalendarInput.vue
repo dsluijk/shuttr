@@ -33,12 +33,9 @@
 </template>
 
 <script lang="ts" setup>
-import {
-  DateFormatter,
-  getLocalTimeZone,
-  type DateValue,
-} from "@internationalized/date";
-import { type DateRange } from "reka-ui";
+import type { DateValue } from "@internationalized/date";
+import type { DateRange } from "reka-ui";
+import { DateFormatter, getLocalTimeZone } from "@internationalized/date";
 
 defineProps<{
   maxValue: DateValue | undefined;

@@ -1,5 +1,5 @@
 import * as z from "zod";
-import { type DateRange } from "reka-ui";
+import type { DateRange } from "reka-ui";
 
 export const dateRangeValidator = (requirePast: boolean = false) => {
   let startValidator = z.date("A valid date is required.");
@@ -32,7 +32,7 @@ export const dateRangeValidator = (requirePast: boolean = false) => {
       end: (range?.end ?? range?.start)?.toDate("UTC"),
     }),
     z
-      .looseObject<z.output<typeof schema>>({} as any)
+      .looseObject<z.output<typeof schema>>({} as z.output<typeof schema>)
       .superRefine((val, ctx) => {
         const result = schema.safeParse(val);
 
