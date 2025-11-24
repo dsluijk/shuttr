@@ -14,6 +14,9 @@
       <UPageCard
         variant="subtle"
         class="overflow-x-auto"
+        :ui="{
+          container: 'p-0 sm:p-0',
+        }"
       >
         <UTable
           v-model:columnVisibility="columnVisibility"
@@ -21,6 +24,12 @@
           :columns="columns"
           :loading="status === 'pending'"
         >
+          <template #title-cell="{ row }">
+            <ULink :to="`/${row.getValue('slug')}`">
+              {{ row.getValue("title") }}
+            </ULink>
+          </template>
+
           <template #sharingAllowed-cell="{ row }">
             <UBadge
               v-bind="
@@ -68,36 +77,51 @@
             />
           </template>
 
-          <template #createdAt-cell="{ row }">
-            <UTooltip
-              :text="row.getValue('createdAt')"
-              :delayDuration="0"
-              class="size-4 mr-2"
-            >
-              <NuxtTime
-                :datetime="row.getValue('createdAt')"
-                relative
-              />
-            </UTooltip>
-          </template>
-
           <template #actions-cell="{ row }">
-            <UDropdownMenu
-              :items="editAlbumItems(row)"
-              :content="{
-                align: 'end',
-              }"
-              :ui="{
-                content: 'min-w-36',
-              }"
-            >
+            <UFieldGroup>
               <UButton
-                icon="i-lucide-ellipsis-vertical"
+                icon="i-lucide-pencil"
                 color="neutral"
-                variant="ghost"
-                aria-label="Actions"
+                variant="soft"
+                size="sm"
+                :to="`/manage/albums/${row.getValue('slug')}`"
               />
-            </UDropdownMenu>
+
+              <UModal
+                title="Are you sure?"
+                :ui="{ footer: 'justify-end' }"
+              >
+                <UButton
+                  icon="i-lucide-trash"
+                  color="error"
+                  variant="soft"
+                  size="sm"
+                />
+
+                <template #body>
+                  Do you really want to delete the album "{{
+                    row.getValue("title")
+                  }}" with it's photos? This action cannot be undone.
+                </template>
+
+                <template #footer="{ close }">
+                  <UFieldGroup>
+                    <UButton
+                      label="Delete"
+                      color="error"
+                      variant="soft"
+                      @click="() => deleteAlbum(row)"
+                    />
+                    <UButton
+                      label="Cancel"
+                      color="neutral"
+                      variant="soft"
+                      @click="close"
+                    />
+                  </UFieldGroup>
+                </template>
+              </UModal>
+            </UFieldGroup>
           </template>
         </UTable>
       </UPageCard>
@@ -119,16 +143,13 @@ useSeoMeta({
 await authorize(editAlbums);
 
 const toast = useToast();
-const { resolve } = useRouter();
-const { copy } = useClipboard();
-const { origin } = useRequestURL();
 
 const { data: albums, status } = await useFetch("/api/albums");
 type AlbumData = NonNullable<typeof albums.value>[number];
 
 const sharingProps = {
   true: { color: "success", icon: "i-lucide-check" } as const,
-  false: { color: "error", icon: "i-lucide-x" } as const,
+  false: { color: "error", icon: "i-lucide-trash" } as const,
 } as const;
 
 const visibilityProps = {
@@ -162,7 +183,7 @@ const columns: TableColumn<AlbumData>[] = [
   },
   {
     accessorKey: "dates",
-    header: "Dates",
+    header: "Date",
   },
   {
     accessorKey: "startDate",
@@ -173,53 +194,9 @@ const columns: TableColumn<AlbumData>[] = [
     header: "End Date",
   },
   {
-    accessorKey: "createdAt",
-    header: "Created",
-  },
-  {
     id: "actions",
   },
 ];
-
-const editAlbumItems = (row: TableRow<AlbumData>) => [
-  [
-    {
-      label: "View",
-      icon: "i-lucide-eye",
-      to: `/${row.getValue("slug")}`,
-    },
-    {
-      label: "Copy Link",
-      icon: "i-lucide-clipboard",
-      onClick: () => copyLink(row),
-    },
-    {
-      label: "Edit",
-      icon: "i-lucide-pencil",
-      to: `/manage/albums/${row.getValue("slug")}`,
-    },
-  ],
-  [
-    {
-      label: "Delete",
-      icon: "i-lucide-x",
-      color: "error",
-      variant: "solid",
-      onClick: () => deleteAlbum(row),
-    },
-  ],
-];
-
-const copyLink = (row: TableRow<AlbumData>) => {
-  const slug = row.getValue("slug");
-  copy(new URL(resolve(`/${slug}`).href, origin).href);
-
-  toast.add({
-    title: "Link Copied",
-    description: "A link to the album has been copied to your clipboard.",
-    icon: "i-lucide-clipboard",
-  });
-};
 
 const deleteAlbum = async (row: TableRow<AlbumData>) => {
   if (!albums.value) return;
@@ -233,8 +210,8 @@ const deleteAlbum = async (row: TableRow<AlbumData>) => {
   toast.add({
     title: "Album deleted",
     description: `The album "${row.getValue("title")}" with ${deletedPhotos} photos has been deleted.`,
-    icon: "i-lucide-x",
-    color: "success",
+    icon: "i-lucide-trash",
+    color: "error",
   });
 };
 </script>

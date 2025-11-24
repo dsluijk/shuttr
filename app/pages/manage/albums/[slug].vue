@@ -105,14 +105,41 @@
                   block
                   @click="() => setCoverPhoto(photo.id)"
                 />
-                <UButton
-                  color="error"
-                  variant="ghost"
-                  icon="i-lucide-trash"
-                  class="rounded-t-none"
-                  block
-                  @click="() => deletePhoto(photo.id)"
-                />
+
+                <UModal
+                  title="Are you sure?"
+                  :ui="{ footer: 'justify-end' }"
+                >
+                  <UButton
+                    color="error"
+                    variant="ghost"
+                    icon="i-lucide-trash"
+                    class="rounded-t-none"
+                    block
+                  />
+
+                  <template #body>
+                    Do you really want to delete this photo? This cannot be
+                    undone.
+                  </template>
+
+                  <template #footer="{ close }">
+                    <UFieldGroup>
+                      <UButton
+                        label="Delete"
+                        color="error"
+                        variant="soft"
+                        @click="() => deletePhoto(photo.id)"
+                      />
+                      <UButton
+                        label="Cancel"
+                        color="neutral"
+                        variant="soft"
+                        @click="close"
+                      />
+                    </UFieldGroup>
+                  </template>
+                </UModal>
               </UFieldGroup>
             </template>
           </UBlogPost>
