@@ -49,6 +49,25 @@
             </UBadge>
           </template>
 
+          <template #dates-cell="{ row }">
+            <NuxtTime
+              :datetime="row.getValue('startDate')"
+              year="numeric"
+              month="short"
+              day="numeric"
+            />
+            <span v-if="row.getValue('startDate') !== row.getValue('endDate')">
+              &nbsp;-&nbsp;
+            </span>
+            <NuxtTime
+              v-if="row.getValue('startDate') !== row.getValue('endDate')"
+              :datetime="row.getValue('endDate')"
+              year="numeric"
+              month="short"
+              day="numeric"
+            />
+          </template>
+
           <template #createdAt-cell="{ row }">
             <UTooltip
               :text="row.getValue('createdAt')"
@@ -120,6 +139,8 @@ const visibilityProps = {
 
 const columnVisibility = ref({
   slug: false,
+  startDate: false,
+  endDate: false,
 });
 
 const columns: TableColumn<AlbumData>[] = [
@@ -138,6 +159,18 @@ const columns: TableColumn<AlbumData>[] = [
   {
     accessorKey: "visibility",
     header: "Visibility",
+  },
+  {
+    accessorKey: "dates",
+    header: "Dates",
+  },
+  {
+    accessorKey: "startDate",
+    header: "Start Date",
+  },
+  {
+    accessorKey: "endDate",
+    header: "End Date",
   },
   {
     accessorKey: "createdAt",

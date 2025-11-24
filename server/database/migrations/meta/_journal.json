@@ -57,6 +57,13 @@
       "when": 1763854847275,
       "tag": "0007_imageFormat",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1763920225198,
+      "tag": "0008_albumdates",
+      "breakpoints": true
     }
   ]
 }

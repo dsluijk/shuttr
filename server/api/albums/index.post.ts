@@ -19,6 +19,8 @@ export default defineEventHandler(async (event) => {
       title: body.title,
       slug,
       description: body.description,
+      startDate: body.date.start,
+      endDate: body.date.end,
       visibility: body.visibility,
       sharingAllowed: body.visibility !== "public" ? body.sharingAllowed : true,
     })
@@ -45,4 +47,28 @@ const bodySchema = z.object({
     .max(512, "Cannot be longer than 512 characters"),
   visibility: z.enum(AlbumVisibility),
   sharingAllowed: z.boolean(),
+  date: z
+    .object({
+      start: z.coerce
+        .date()
+        .max(new Date())
+        .refine(
+          (date) =>
+            date.getUTCHours() === 0
+            && date.getUTCMinutes() === 0
+            && date.getUTCSeconds() === 0,
+          "Time must be at midnight.",
+        ),
+      end: z.coerce
+        .date()
+        .max(new Date())
+        .refine(
+          (date) =>
+            date.getUTCHours() === 0
+            && date.getUTCMinutes() === 0
+            && date.getUTCSeconds() === 0,
+          "Time must be at midnight.",
+        ),
+    })
+    .refine(({ start, end }) => start <= end),
 });

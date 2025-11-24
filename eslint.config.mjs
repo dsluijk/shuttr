@@ -56,6 +56,7 @@ export default withNuxt({
     ],
     "vue/attribute-hyphenation": ["error", "never"],
     "vue/multi-word-component-names": ["off"],
+    "vue/singleline-html-element-content-newline": ["off"],
     "nuxt/nuxt-config-keys-order": ["off"], // Doesn't work properly
   },
 });

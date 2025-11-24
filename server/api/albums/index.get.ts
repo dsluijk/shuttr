@@ -9,7 +9,10 @@ export default defineEventHandler(async (event) => {
 
   const db = useDrizzle();
   return await db.query.album.findMany({
-    orderBy: (album, { desc }) => [desc(album.createdAt)],
+    orderBy: (album, { desc }) => [
+      desc(album.startDate),
+      desc(album.createdAt),
+    ],
     with: {
       cover: {
         columns: {

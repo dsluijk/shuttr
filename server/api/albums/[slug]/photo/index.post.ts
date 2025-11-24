@@ -52,7 +52,6 @@ export default defineEventHandler(async (event) => {
   const metadata = await sharp(original).metadata();
   const { width, height } = metadata.autoOrient;
 
-  console.log(metadata.size, original.byteLength);
   if ((metadata.size ?? original.byteLength) > 50 * 1024 * 1024) {
     throw createError({
       statusCode: 400,

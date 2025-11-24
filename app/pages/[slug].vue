@@ -10,6 +10,25 @@
         :thumbhash="album.cover.thumbHash"
         class="w-full lg:h-[450px] h-[350px] rounded-lg object-cover object-center"
       />
+
+      <template #links>
+        <span>
+          <NuxtTime
+            :datetime="album.startDate"
+            year="numeric"
+            month="long"
+            day="numeric"
+          />
+          <span v-if="album.startDate !== album.endDate">&nbsp;-&nbsp;</span>
+          <NuxtTime
+            v-if="album.startDate !== album.endDate"
+            :datetime="album.endDate"
+            year="numeric"
+            month="long"
+            day="numeric"
+          />
+        </span>
+      </template>
     </AnimatedHero>
 
     <UPageBody class="mt-0">
