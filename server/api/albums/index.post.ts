@@ -3,6 +3,8 @@ import slugify from "slugify";
 import { init as cuid2 } from "@paralleldrive/cuid2";
 
 import { AlbumVisibility } from "~~/server/database/schema/album";
+import type { label } from "~~/server/database/schema/label";
+import type { albumLabels } from "~~/server/database/schema";
 
 export default defineEventHandler(async (event) => {
   await authorize(event, editAlbums);
@@ -19,13 +21,13 @@ export default defineEventHandler(async (event) => {
     });
 
   const db = useDrizzle();
-  const existingLabels =
-    body.labels.length > 0
-      ? await db.query.label.findMany({
-          where: (label, { eq, or }) =>
-            or(...body.labels.map((labelId) => eq(label.id, labelId))),
-        })
-      : [];
+  let existingLabels: (typeof label.$inferSelect)[] = [];
+  if (body.labels.length > 0) {
+    existingLabels = await db.query.label.findMany({
+      where: (label, { eq, or }) =>
+        or(...body.labels.map((labelId) => eq(label.id, labelId))),
+    });
+  }
 
   if (existingLabels.length !== body.labels.length) {
     throw createError({
@@ -58,18 +60,18 @@ export default defineEventHandler(async (event) => {
     }
     const createdAlbum = result[0];
 
-    const labelResult =
-      existingLabels.length > 0
-        ? await tx
-            .insert(tables.albumLabels)
-            .values(
-              existingLabels.map((label) => ({
-                albumId: createdAlbum.id,
-                labelId: label.id,
-              })),
-            )
-            .returning()
-        : [];
+    let labelResult: (typeof albumLabels.$inferSelect)[] = [];
+    if (existingLabels.length > 0) {
+      labelResult = await tx
+        .insert(tables.albumLabels)
+        .values(
+          existingLabels.map((label) => ({
+            albumId: createdAlbum.id,
+            labelId: label.id,
+          })),
+        )
+        .returning();
+    }
 
     return {
       ...createdAlbum,
