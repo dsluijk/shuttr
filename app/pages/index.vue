@@ -127,6 +127,19 @@
                 class="rounded-lg w-full h-full bg-radial-[at_60%_60%] from-neutral-300 to-neutral-100 dark:from-neutral-800 dark:to-neutral-700"
               />
             </template>
+
+            <template #badge>
+              <div v-if="album.albumLabels.length > 0">
+                <UBadge
+                  v-for="albumLabel of album.albumLabels"
+                  :key="albumLabel.labelId"
+                  :variant="albumLabel.label.style"
+                  size="sm"
+                >
+                  {{ albumLabel.label.title }}
+                </UBadge>
+              </div>
+            </template>
           </UBlogPost>
         </Motion>
       </UBlogPosts>

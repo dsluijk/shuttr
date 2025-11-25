@@ -2,7 +2,6 @@
   <div v-if="album">
     <UPageHeader
       :title="album.title"
-      :description="album.description"
       headline="Editting Album"
       :links="[
         {
@@ -19,7 +18,21 @@
           variant: 'soft',
         },
       ]"
-    />
+    >
+      <template #description>
+        <span>{{ album.description }}</span>
+        <div class="mt-4">
+          <UBadge
+            v-for="albumLabel of album.albumLabels"
+            :key="albumLabel.labelId"
+            :variant="albumLabel.label.style"
+            size="xl"
+          >
+            {{ albumLabel.label.title }}
+          </UBadge>
+        </div>
+      </template>
+    </UPageHeader>
 
     <UPageBody>
       <UFileUpload

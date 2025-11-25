@@ -143,6 +143,7 @@ const deleteLabel = async (row: TableRow<LabelData>, close: () => void) => {
   await useRequestFetch()(`/api/labels/${id}`, {
     method: "DELETE",
   });
+  close();
 
   labels.value = labels.value.filter((label) => label.id !== id);
   toast.add({
@@ -151,7 +152,5 @@ const deleteLabel = async (row: TableRow<LabelData>, close: () => void) => {
     icon: "i-lucide-tag",
     color: "error",
   });
-
-  close();
 };
 </script>

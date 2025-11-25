@@ -65,7 +65,24 @@
     </template>
 
     <template #links>
-      <slot name="links" />
+      <Motion
+        :initial="{
+          scale: 1.1,
+          opacity: 0,
+          filter: 'blur(20px)',
+        }"
+        :animate="{
+          scale: 1,
+          opacity: 1,
+          filter: 'blur(0px)',
+        }"
+        :transition="{
+          duration: 0.25,
+          delay: 0.2,
+        }"
+      >
+        <slot name="links" />
+      </Motion>
     </template>
   </UPageHero>
 </template>

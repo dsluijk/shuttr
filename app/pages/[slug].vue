@@ -28,6 +28,19 @@
             day="numeric"
           />
         </span>
+        <div
+          v-if="album.albumLabels.length > 0"
+          class="mt-4"
+        >
+          <UBadge
+            v-for="albumLabel of album.albumLabels"
+            :key="albumLabel.labelId"
+            :variant="albumLabel.label.style"
+            size="lg"
+          >
+            {{ albumLabel.label.title }}
+          </UBadge>
+        </div>
       </template>
     </AnimatedHero>
 

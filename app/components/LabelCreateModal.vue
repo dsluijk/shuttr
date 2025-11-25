@@ -1,8 +1,8 @@
 <template>
   <UModal
+    v-model:open="modalOpen"
     title="Add Label"
     description="Create a new label."
-    v-model:open="modalOpen"
   >
     <UButton
       color="primary"
@@ -74,7 +74,8 @@
 <script setup lang="ts">
 import * as z from "zod";
 import type { FormSubmitEvent } from "@nuxt/ui";
-import { label, LabelStyle } from "~~/server/database/schema/label";
+import type { label } from "~~/server/database/schema/label";
+import { LabelStyle } from "~~/server/database/schema/label";
 
 const emit = defineEmits<{
   create: [typeof label.$inferSelect];
