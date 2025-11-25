@@ -19,6 +19,11 @@ export default defineEventHandler(async (event) => {
           location: false,
         },
       },
+      albumLabels: {
+        with: {
+          label: true,
+        },
+      },
     },
     where: (album, { eq, or }) =>
       or(
