@@ -36,7 +36,6 @@
         <UFormField
           label="Description"
           name="description"
-          required
         >
           <UTextarea
             v-model="state.description"
@@ -163,7 +162,6 @@ const schema = z.object({
     .max(64, "Cannot be longer than 64 characters"),
   description: z
     .string("You must specify a description")
-    .min(6, "Must be at least 6 characters")
     .max(512, "Cannot be longer than 512 characters"),
   date: dateRangeValidator(true),
   labels: z.array(z.cuid2()).max(4).default([]),
@@ -175,8 +173,8 @@ type SchemaIn = z.input<typeof schema>;
 type SchemaOut = z.output<typeof schema>;
 
 const state = shallowReactive<Partial<SchemaIn>>({
-  title: undefined,
-  description: undefined,
+  title: "",
+  description: "",
   date: {
     start: undefined,
     end: undefined,
