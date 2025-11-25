@@ -1,5 +1,6 @@
 import * as z from "zod";
 import slugify from "slugify";
+import { init as cuid2 } from "@paralleldrive/cuid2";
 
 import { AlbumVisibility } from "~~/server/database/schema/album";
 
@@ -7,10 +8,15 @@ export default defineEventHandler(async (event) => {
   await authorize(event, editAlbums);
 
   const body = await readValidatedBody(event, bodySchema.parse);
-  const slug = slugify(body.title, {
-    lower: true,
-    strict: true,
-  });
+  const slug =
+    cuid2({
+      length: 6,
+    })()
+    + "-"
+    + slugify(body.title, {
+      lower: true,
+      strict: true,
+    });
 
   const db = useDrizzle();
   const existingLabels = await db.query.label.findMany({
