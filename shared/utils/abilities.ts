@@ -34,6 +34,14 @@ export const editAlbums = defineAbility((user: User) => {
   return deny();
 });
 
+export const editLabels = defineAbility((user: User) => {
+  if (atLeastRole(UserRole.PUBLISHER, user.role)) {
+    return allow();
+  }
+
+  return deny();
+});
+
 export const viewAlbum = defineAbility(
   { allowGuest: true },
   (

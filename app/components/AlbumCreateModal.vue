@@ -61,6 +61,41 @@
         </UFormField>
 
         <UFormField
+          label="Labels"
+          name="labels"
+        >
+          <USelectMenu
+            v-model="state.labels"
+            :items="labels"
+            :loading="labelsLoading"
+            valueKey="id"
+            labelKey="title"
+            createItem="always"
+            placeholder="Enter labels.."
+            variant="soft"
+            size="lg"
+            class="w-full"
+            multiple
+            @create="(labelTitle) => createLabel(labelTitle)"
+          >
+            <template #default="{ modelValue }">
+              <UBadge
+                v-for="(label, index) of mapLabelIds(modelValue ?? [])"
+                :key="index"
+                size="sm"
+                :variant="label?.style"
+              >
+                {{ label?.title ?? "Unknown" }}
+              </UBadge>
+            </template>
+
+            <template #item-label="{ item: label }">
+              <UBadge :variant="label.style">{{ label.title }}</UBadge>
+            </template>
+          </USelectMenu>
+        </UFormField>
+
+        <UFormField
           label="Visibility"
           name="visibility"
           required
@@ -104,6 +139,10 @@ import { CalendarDate } from "@internationalized/date";
 
 const toast = useToast();
 
+const { data: labels, pending: labelsLoading } = await useFetch("/api/labels", {
+  deep: true,
+});
+
 const now = new Date();
 const maxDate = new CalendarDate(
   now.getFullYear(),
@@ -127,6 +166,7 @@ const schema = z.object({
     .min(6, "Must be at least 6 characters")
     .max(512, "Cannot be longer than 512 characters"),
   date: dateRangeValidator(true),
+  labels: z.array(z.cuid2()).max(4).default([]),
   visibility: z.enum(visibilityOptions.value.map((opt) => opt.value)),
   sharingAllowed: z.boolean(),
 });
@@ -137,13 +177,19 @@ type SchemaOut = z.output<typeof schema>;
 const state = shallowReactive<Partial<SchemaIn>>({
   title: undefined,
   description: undefined,
-  visibility: "public",
-  sharingAllowed: true,
   date: {
     start: undefined,
     end: undefined,
   },
+  labels: [],
+  visibility: "public",
+  sharingAllowed: true,
 });
+
+const mapLabelIds = (labelIds: string[]) =>
+  labelIds.map((labelId) =>
+    labels.value?.find((label) => label.id === labelId),
+  );
 
 const createAlbum = async (event: FormSubmitEvent<SchemaOut>) => {
   const createdAlbum = await useRequestFetch()("/api/albums", {
@@ -159,5 +205,19 @@ const createAlbum = async (event: FormSubmitEvent<SchemaOut>) => {
   });
 
   await navigateTo(`/manage/albums/${createdAlbum?.slug}`);
+};
+
+const createLabel = async (labelTitle: string) => {
+  const createdLabel = await useRequestFetch()("/api/labels", {
+    method: "POST",
+    body: {
+      title: labelTitle,
+      style: "solid",
+    },
+  });
+
+  if (!createdLabel) return;
+  labels.value?.unshift(createdLabel);
+  state.labels?.push(createdLabel.id);
 };
 </script>

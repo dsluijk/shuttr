@@ -13,27 +13,60 @@ export default defineEventHandler(async (event) => {
   });
 
   const db = useDrizzle();
-  const result = await db
-    .insert(tables.album)
-    .values({
-      title: body.title,
-      slug,
-      description: body.description,
-      startDate: body.date.start,
-      endDate: body.date.end,
-      visibility: body.visibility,
-      sharingAllowed: body.visibility !== "public" ? body.sharingAllowed : true,
-    })
-    .returning();
+  const existingLabels = await db.query.label.findMany({
+    where: (label, { eq, or }) =>
+      or(...body.labels.map((labelId) => eq(label.id, labelId))),
+  });
 
-  if (result.length !== 1) {
+  if (existingLabels.length !== body.labels.length) {
     throw createError({
-      statusCode: 500,
-      message: "Failed to create album",
+      statusCode: 400,
+      message: "Not all labels provided actually exist",
     });
   }
 
-  return result[0];
+  return await db.transaction(async (tx) => {
+    const result = await tx
+      .insert(tables.album)
+      .values({
+        title: body.title,
+        slug,
+        description: body.description,
+        startDate: body.date.start,
+        endDate: body.date.end,
+        visibility: body.visibility,
+        sharingAllowed:
+          body.visibility !== "public" ? body.sharingAllowed : true,
+      })
+      .returning();
+
+    if (result.length !== 1 || !result[0]) {
+      tx.rollback();
+      throw createError({
+        statusCode: 500,
+        message: "Failed to create album",
+      });
+    }
+    const createdAlbum = result[0];
+
+    const labelResult = await tx
+      .insert(tables.albumLabels)
+      .values(
+        existingLabels.map((label) => ({
+          albumId: createdAlbum.id,
+          labelId: label.id,
+        })),
+      )
+      .returning();
+
+    return {
+      ...createdAlbum,
+      labels: labelResult.map((label) => ({
+        ...label,
+        label: existingLabels.find((existing) => label.labelId === existing.id),
+      })),
+    };
+  });
 });
 
 const bodySchema = z.object({
@@ -45,8 +78,6 @@ const bodySchema = z.object({
     .string("You must specify a description")
     .min(6, "Must be at least 6 characters")
     .max(512, "Cannot be longer than 512 characters"),
-  visibility: z.enum(AlbumVisibility),
-  sharingAllowed: z.boolean(),
   date: z
     .object({
       start: z.coerce
@@ -71,4 +102,7 @@ const bodySchema = z.object({
         ),
     })
     .refine(({ start, end }) => start <= end),
+  labels: z.array(z.cuid2()).max(4),
+  visibility: z.enum(AlbumVisibility),
+  sharingAllowed: z.boolean(),
 });

@@ -10,6 +10,7 @@ import {
 import { cuid2, enumToPgEnum } from "./utils";
 import { relations } from "drizzle-orm";
 import { photo } from "./photo";
+import { albumLabels } from "./albumLabels";
 
 export enum AlbumVisibility {
   // Anyone can see the album on the homepage.
@@ -48,5 +49,6 @@ export const album = pgTable(
 
 export const albumRelations = relations(album, ({ many, one }) => ({
   photos: many(photo),
+  albumLabels: many(albumLabels),
   cover: one(photo, { fields: [album.coverPhoto], references: [photo.id] }),
 }));

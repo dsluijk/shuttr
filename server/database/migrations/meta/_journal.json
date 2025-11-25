@@ -64,6 +64,13 @@
       "when": 1763920225198,
       "tag": "0008_albumdates",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1764079572242,
+      "tag": "0009_labels",
+      "breakpoints": true
     }
   ]
 }
