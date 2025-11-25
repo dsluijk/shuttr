@@ -19,10 +19,13 @@ export default defineEventHandler(async (event) => {
     });
 
   const db = useDrizzle();
-  const existingLabels = await db.query.label.findMany({
-    where: (label, { eq, or }) =>
-      or(...body.labels.map((labelId) => eq(label.id, labelId))),
-  });
+  const existingLabels =
+    body.labels.length > 0
+      ? await db.query.label.findMany({
+          where: (label, { eq, or }) =>
+            or(...body.labels.map((labelId) => eq(label.id, labelId))),
+        })
+      : [];
 
   if (existingLabels.length !== body.labels.length) {
     throw createError({
@@ -55,15 +58,18 @@ export default defineEventHandler(async (event) => {
     }
     const createdAlbum = result[0];
 
-    const labelResult = await tx
-      .insert(tables.albumLabels)
-      .values(
-        existingLabels.map((label) => ({
-          albumId: createdAlbum.id,
-          labelId: label.id,
-        })),
-      )
-      .returning();
+    const labelResult =
+      existingLabels.length > 0
+        ? await tx
+            .insert(tables.albumLabels)
+            .values(
+              existingLabels.map((label) => ({
+                albumId: createdAlbum.id,
+                labelId: label.id,
+              })),
+            )
+            .returning()
+        : [];
 
     return {
       ...createdAlbum,
