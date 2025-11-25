@@ -90,8 +90,8 @@ const bodySchema = z.object({
     .max(64, "Cannot be longer than 64 characters"),
   description: z
     .string("You must specify a description")
-    .min(6, "Must be at least 6 characters")
-    .max(512, "Cannot be longer than 512 characters"),
+    .max(512, "Cannot be longer than 512 characters")
+    .default(""),
   date: z
     .object({
       start: z.coerce

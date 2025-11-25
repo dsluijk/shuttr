@@ -43,7 +43,10 @@
       </Motion>
     </template>
 
-    <template #description>
+    <template
+      #description
+      v-if="description"
+    >
       <Motion
         :initial="{
           scale: 1.1,
