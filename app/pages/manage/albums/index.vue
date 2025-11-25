@@ -110,7 +110,7 @@
                       label="Delete"
                       color="error"
                       variant="soft"
-                      @click="() => deleteAlbum(row)"
+                      @click="() => deleteAlbum(row, close)"
                     />
                     <UButton
                       label="Cancel"
@@ -198,13 +198,15 @@ const columns: TableColumn<AlbumData>[] = [
   },
 ];
 
-const deleteAlbum = async (row: TableRow<AlbumData>) => {
+const deleteAlbum = async (row: TableRow<AlbumData>, close: () => void) => {
   if (!albums.value) return;
 
   const slug = row.getValue("slug");
   const { deletedPhotos } = await useRequestFetch()(`/api/albums/${slug}`, {
     method: "DELETE",
   });
+
+  close();
 
   albums.value = albums.value.filter((album) => album.slug !== slug);
   toast.add({
