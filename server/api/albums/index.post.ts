@@ -86,7 +86,7 @@ export default defineEventHandler(async (event) => {
 const bodySchema = z.object({
   title: z
     .string("A title is required")
-    .min(4, "Must be at least 4 characters")
+    .min(2, "Must be at least 2 characters")
     .max(64, "Cannot be longer than 64 characters"),
   description: z
     .string("You must specify a description")
