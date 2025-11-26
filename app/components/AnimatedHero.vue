@@ -44,8 +44,8 @@
     </template>
 
     <template
-      #description
       v-if="description"
+      #description
     >
       <Motion
         :initial="{

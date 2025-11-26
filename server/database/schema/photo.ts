@@ -25,6 +25,7 @@ export const photo = pgTable(
     id: cuid2().primaryKey(),
     album: cuid2().notNull(),
     type: photoTypeColumn().notNull(),
+    fileName: text().notNull(),
     originalDigest: text().notNull(),
     thumbHash: text().notNull(),
     size: integer().notNull(),

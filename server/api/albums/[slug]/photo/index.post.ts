@@ -26,15 +26,37 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const original = await readRawBody(event, false);
-  if (original === undefined) {
+  const form = await readMultipartFormData(event);
+  if (form === undefined || form[0] === undefined || form[0].name !== "file") {
     throw createError({
       statusCode: 400,
-      statusMessage: "No image uploaded",
+      statusMessage: "No file uploaded.",
     });
   }
 
-  const originalDigest = await createDigest(new Uint8Array(original).buffer);
+  if (form.length > 1) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: "Too much form data attached.",
+    });
+  }
+
+  const file = form[0];
+  if (file.filename === undefined) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: "No filename set.",
+    });
+  }
+
+  if (file.filename.length > 100) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: "Filename too long.",
+    });
+  }
+
+  const originalDigest = await createDigest(new Uint8Array(file.data).buffer);
   const existingPhotos = await db.query.photo.findMany({
     where: (photo, { and, eq }) =>
       and(eq(photo.album, album.id), eq(photo.originalDigest, originalDigest)),
@@ -49,10 +71,10 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const metadata = await sharp(original).metadata();
+  const metadata = await sharp(file.data).metadata();
   const { width, height } = metadata.autoOrient;
 
-  if ((metadata.size ?? original.byteLength) > 50 * 1024 * 1024) {
+  if ((metadata.size ?? file.data.byteLength) > 50 * 1024 * 1024) {
     throw createError({
       statusCode: 400,
       statusMessage: "Image too large",
@@ -68,7 +90,7 @@ export default defineEventHandler(async (event) => {
 
   let tags;
   try {
-    tags = exifReader.load(original, {
+    tags = exifReader.load(file.data, {
       includeUnknown: true,
       expanded: true,
     });
@@ -79,7 +101,7 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const large = await sharp(original)
+  const large = await sharp(file.data)
     .webp()
     .autoOrient()
     .resize(2000, 2000, { fit: "inside", withoutEnlargement: true })
@@ -101,9 +123,10 @@ export default defineEventHandler(async (event) => {
     .values({
       album: album.id,
       type: PhotoType[metadata.format],
+      fileName: file.filename,
       originalDigest,
       thumbHash,
-      size: metadata.size ?? original.byteLength,
+      size: metadata.size ?? file.data.byteLength,
       width,
       height,
       dateTime,
@@ -137,7 +160,7 @@ export default defineEventHandler(async (event) => {
   );
   await storage.setItemRaw(
     `storage:photo:${album.id}:${photo.id}:original`,
-    original,
+    file.data,
   );
 
   return photo;
