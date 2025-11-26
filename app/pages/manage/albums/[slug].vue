@@ -190,13 +190,12 @@ const uploaded = ref(0);
 const uploadFile = async (file: File) => {
   if (!album.value) return;
 
+  const form = new FormData();
+  form.append("file", file);
   const uploadedPhoto = await $fetch(`/api/albums/${album.value.slug}/photo`, {
     method: "POST",
-    retry: 3,
-    headers: {
-      "Content-Type": file.type,
-    },
-    body: await file.bytes(),
+    retry: 2,
+    body: form,
   });
 
   if (uploadedPhoto) {
