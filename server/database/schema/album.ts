@@ -32,7 +32,7 @@ export const album = pgTable(
     id: cuid2().primaryKey(),
     // Slug used to access the album, usually generated from the title.
     slug: varchar({ length: 128 }).notNull().unique(),
-    title: varchar({ length: 64 }).notNull().unique(),
+    title: varchar({ length: 64 }).notNull(),
     description: varchar({ length: 512 }).notNull(),
     coverPhoto: cuid2(),
     startDate: date({ mode: "date" }).notNull(),

@@ -1,0 +1,1 @@
+ALTER TABLE "album" DROP CONSTRAINT "album_title_unique";
