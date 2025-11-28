@@ -1,8 +1,10 @@
+import { useRequestHeader } from "#imports";
+
 export const useDetectIframe = () => {
   if (import.meta.client) {
     try {
       return window.self !== window.top;
-    } catch (e) {
+    } catch {
       return true;
     }
   } else {
