@@ -1,9 +1,3 @@
-<script setup lang="ts">
-useSeoMeta({
-  titleTemplate: "%s - Shuttr",
-});
-</script>
-
 <template>
   <UApp>
     <NuxtLayout>
@@ -13,3 +7,11 @@ useSeoMeta({
     </NuxtLayout>
   </UApp>
 </template>
+
+<script setup lang="ts">
+const config = useRuntimeConfig().public;
+
+useSeoMeta({
+  titleTemplate: `%s - ${config.title}`,
+});
+</script>

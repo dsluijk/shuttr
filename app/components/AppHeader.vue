@@ -1,6 +1,6 @@
 <template>
   <UHeader
-    title="Shuttr"
+    :title="config.title"
     :toggle="false"
   >
     <template #right>
@@ -28,4 +28,5 @@
 
 <script setup lang="ts">
 const isIframe = useDetectIframe();
+const config = useRuntimeConfig().public;
 </script>

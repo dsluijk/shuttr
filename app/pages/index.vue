@@ -2,8 +2,8 @@
   <UPage>
     <AnimatedHero
       v-if="!isIframe"
-      title="Shuttr Photo Gallery"
-      description="Shuttr is a simple to use self-hosted photo gallery for amateurs."
+      :title="config.header"
+      :description="config.description"
     >
       <div
         class="rounded-lg w-full lg:h-[450px] h-[350px] bg-radial-[at_60%_60%] from-neutral-300 to-neutral-100 dark:from-neutral-800 dark:to-neutral-700"
@@ -12,7 +12,7 @@
       <template #links>
         <div class="gap-x-4 inline-flex">
           <Motion
-            v-for="(link, index) of socials"
+            v-for="(link, index) of config.links"
             :key="index"
             :initial="{
               scale: 1.1,
@@ -34,6 +34,7 @@
                 size: 'md',
                 color: 'neutral',
                 variant: 'ghost',
+                target: '_blank',
                 ...link,
               }"
             />
@@ -190,12 +191,13 @@
 <script setup lang="ts">
 const { data: albums } = await useFetch("/api/albums");
 const isIframe = useDetectIframe();
+const config = useRuntimeConfig().public;
 
 useSeoMeta({
   titleTemplate: "",
-  title: "Shuttr",
-  ogTitle: "Shuttr",
-  description: "Shuttr Photo Gallery",
-  ogDescription: "Shuttr Photo Gallery",
+  title: config.header,
+  ogTitle: config.header,
+  description: config.description,
+  ogDescription: config.description,
 });
 </script>
