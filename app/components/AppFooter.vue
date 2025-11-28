@@ -24,11 +24,21 @@
 
     <template #right>
       <UButton
-        v-for="(link, index) of socials"
+        v-for="(link, index) of config.links"
         :key="index"
-        v-bind="{ size: 'xs', color: 'neutral', variant: 'ghost', ...link }"
+        v-bind="{
+          size: 'xs',
+          color: 'neutral',
+          variant: 'ghost',
+          target: '_blank',
+          ...link,
+        }"
       />
       <ColorModeButton />
     </template>
   </UFooter>
 </template>
+
+<script setup lang="ts">
+const config = useRuntimeConfig().public;
+</script>
