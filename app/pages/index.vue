@@ -1,6 +1,7 @@
 <template>
   <UPage>
     <AnimatedHero
+      v-if="!isIframe"
       title="Shuttr Photo Gallery"
       description="Shuttr is a simple to use self-hosted photo gallery for amateurs."
     >
@@ -41,8 +42,12 @@
       </template>
     </AnimatedHero>
 
-    <UPageBody v-if="albums">
+    <UPageBody
+      v-if="albums"
+      class="mt-0"
+    >
       <Motion
+        :class="isIframe ? 'mb-4' : ''"
         :initial="{
           scale: 1.1,
           opacity: 0,
@@ -184,6 +189,7 @@
 
 <script setup lang="ts">
 const { data: albums } = await useFetch("/api/albums");
+const isIframe = useDetectIframe();
 
 useSeoMeta({
   titleTemplate: "",

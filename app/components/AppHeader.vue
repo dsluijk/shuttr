@@ -4,7 +4,10 @@
     :toggle="false"
   >
     <template #right>
-      <AuthState v-slot="{ loggedIn, user, clear }">
+      <AuthState
+        v-if="!isIframe"
+        v-slot="{ loggedIn, user, clear }"
+      >
         <ProfileDropdown
           v-if="loggedIn"
           :user
@@ -12,6 +15,17 @@
         />
         <LoginModal v-else />
       </AuthState>
+      <UButton
+        v-else
+        :to="$route.fullPath"
+        target="_blank"
+      >
+        Open Gallery
+      </UButton>
     </template>
   </UHeader>
 </template>
+
+<script setup lang="ts">
+const isIframe = useDetectIframe();
+</script>
