@@ -69,15 +69,44 @@
         >
           <div class="flex-1 w-full">
             <UInput
+              v-model="searchQuery.search"
               variant="soft"
               icon="i-lucide-search"
-              placeholder="Search..."
+              placeholder="Search.."
               class="w-full"
-              disabled
             />
           </div>
 
-          <div class="flex w-full md:w-auto flex-wrap items-center gap-1.5" />
+          <div class="flex w-full md:w-auto flex-wrap items-center gap-1.5">
+            <USelectMenu
+              v-model="searchQuery.labels"
+              :items="labels"
+              :loading="labelsLoading"
+              valueKey="id"
+              labelKey="title"
+              placeholder="Select labels.."
+              variant="soft"
+              size="md"
+              class="w-full md:w-48 overflow-hidden"
+              multiple
+            >
+              <template #default="{ modelValue }">
+                <UBadge
+                  v-for="(label, index) of mapLabelIds(modelValue ?? [])"
+                  :key="index"
+                  size="sm"
+                  :variant="label?.style"
+                  class="truncate max-w-24"
+                >
+                  {{ label?.title ?? "Unknown" }}
+                </UBadge>
+              </template>
+
+              <template #item-label="{ item: label }">
+                <UBadge :variant="label.style">{{ label.title }}</UBadge>
+              </template>
+            </USelectMenu>
+          </div>
         </div>
       </Motion>
 
@@ -138,11 +167,11 @@
               <div v-if="album.albumLabels.length > 0">
                 <UBadge
                   v-for="albumLabel of album.albumLabels"
-                  :key="albumLabel.labelId"
-                  :variant="albumLabel.label.style"
+                  :key="albumLabel.id"
+                  :variant="albumLabel.style"
                   size="sm"
                 >
-                  {{ albumLabel.label.title }}
+                  {{ albumLabel.title }}
                 </UBadge>
               </div>
             </template>
@@ -189,7 +218,8 @@
 </template>
 
 <script setup lang="ts">
-const { data: albums } = await useFetch("/api/albums");
+import z from "zod";
+
 const isIframe = useDetectIframe();
 const config = useRuntimeConfig().public;
 
@@ -199,5 +229,25 @@ useSeoMeta({
   ogTitle: config.header,
   description: config.description,
   ogDescription: config.description,
+});
+
+const { data: labels, pending: labelsLoading } = await useFetch("/api/labels");
+const mapLabelIds = (labelIds: string[]) =>
+  labelIds.map((labelId) =>
+    labels.value?.find((label) => label.id === labelId),
+  );
+
+const schema = z.object({
+  search: z.string().max(60, "Cannot be longer than 60 characters"),
+  labels: z.array(z.cuid2()).max(4).default([]),
+});
+
+const searchQuery = reactive<z.input<typeof schema>>({
+  search: "",
+  labels: [],
+});
+
+const { data: albums } = await useFetch("/api/albums", {
+  query: searchQuery,
 });
 </script>

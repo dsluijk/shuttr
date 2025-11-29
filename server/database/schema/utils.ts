@@ -1,4 +1,4 @@
-import { char } from "drizzle-orm/pg-core";
+import { char, customType } from "drizzle-orm/pg-core";
 import { init } from "@paralleldrive/cuid2";
 
 export const cuid2 = (length: number = 24) => {
@@ -14,3 +14,11 @@ export function enumToPgEnum<T extends Record<string, unknown>>(
     ...T[keyof T][],
   ];
 }
+
+export const tsvector = customType<{
+  data: string;
+}>({
+  dataType() {
+    return `tsvector`;
+  },
+});

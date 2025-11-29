@@ -7,8 +7,8 @@ import {
   timestamp,
   varchar,
 } from "drizzle-orm/pg-core";
-import { cuid2, enumToPgEnum } from "./utils";
-import { relations } from "drizzle-orm";
+import { cuid2, enumToPgEnum, tsvector } from "./utils";
+import { relations, sql, SQL } from "drizzle-orm";
 import { photo } from "./photo";
 import { albumLabels } from "./albumLabels";
 
@@ -34,6 +34,12 @@ export const album = pgTable(
     slug: varchar({ length: 128 }).notNull().unique(),
     title: varchar({ length: 64 }).notNull(),
     description: varchar({ length: 512 }).notNull(),
+    search: tsvector()
+      .notNull()
+      .generatedAlwaysAs(
+        (): SQL =>
+          sql`setweight(to_tsvector('english', ${album.title}), 'A') || setweight(to_tsvector('english', ${album.description}), 'B')`,
+      ),
     coverPhoto: cuid2(),
     startDate: date({ mode: "date" }).notNull(),
     endDate: date({ mode: "date" }).notNull(),
@@ -44,7 +50,7 @@ export const album = pgTable(
     sharingAllowed: boolean().notNull(),
     createdAt: timestamp().notNull().defaultNow(),
   },
-  (t) => [index().on(t.slug)],
+  (t) => [index().on(t.slug), index().using("gin", t.search)],
 );
 
 export const albumRelations = relations(album, ({ many, one }) => ({

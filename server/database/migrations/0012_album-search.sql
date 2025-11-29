@@ -1,0 +1,2 @@
+ALTER TABLE "album" ADD COLUMN "search" "tsvector" GENERATED ALWAYS AS (setweight(to_tsvector('english', "album"."title"), 'A') || setweight(to_tsvector('english', "album"."description"), 'B')) STORED NOT NULL;--> statement-breakpoint
+CREATE INDEX "album_search_index" ON "album" USING gin ("search");
