@@ -19,6 +19,6 @@ export const tsvector = customType<{
   data: string;
 }>({
   dataType() {
-    return `tsvector`;
+    return "tsvector";
   },
 });

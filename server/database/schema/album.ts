@@ -8,7 +8,7 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 import { cuid2, enumToPgEnum, tsvector } from "./utils";
-import { relations, sql, SQL } from "drizzle-orm";
+import { relations, sql, type SQL } from "drizzle-orm";
 import { photo } from "./photo";
 import { albumLabels } from "./albumLabels";
 

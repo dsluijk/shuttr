@@ -218,8 +218,6 @@
 </template>
 
 <script setup lang="ts">
-import z from "zod";
-
 const isIframe = useDetectIframe();
 const config = useRuntimeConfig().public;
 
@@ -237,14 +235,9 @@ const mapLabelIds = (labelIds: string[]) =>
     labels.value?.find((label) => label.id === labelId),
   );
 
-const schema = z.object({
-  search: z.string().max(60, "Cannot be longer than 60 characters"),
-  labels: z.array(z.cuid2()).max(4).default([]),
-});
-
-const searchQuery = reactive<z.input<typeof schema>>({
+const searchQuery = reactive({
   search: "",
-  labels: [],
+  labels: [] as string[],
 });
 
 const { data: albums } = await useFetch("/api/albums", {
