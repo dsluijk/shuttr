@@ -107,6 +107,10 @@ useSeoMeta({
   ogTitle: album.value.title,
   description: album.value.description,
   ogDescription: album.value.description,
+  ogImage: album.value.cover
+    ? `/photo/${album.value.id}/${album.value.cover.id}/thumb`
+    : undefined,
+  twitterCard: album.value.cover ? "summary_large_image" : undefined,
 });
 
 const getAspectRows = (photo: (typeof album.value.photos)[number]) => {
