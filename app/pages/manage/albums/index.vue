@@ -64,8 +64,8 @@
 
         <div class="overflow-x-auto grid">
           <UTable
-            v-model:columnVisibility="columnVisibility"
             ref="table"
+            v-model:columnVisibility="columnVisibility"
             :data="albums"
             :columns="columns"
             :loading="isLoading"
@@ -228,7 +228,7 @@ const fetchNextAlbums = async () => {
 };
 
 const { reset: resetAlbums } = useInfiniteScroll(
-  table as any,
+  table as unknown as Ref<HTMLElement>,
   fetchNextAlbums,
   {
     canLoadMore: () => hasMore.value && !isLoading.value,
