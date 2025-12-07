@@ -43,10 +43,7 @@
       </template>
     </AnimatedHero>
 
-    <UPageBody
-      v-if="albums"
-      class="mt-0"
-    >
+    <UPageBody class="mt-0">
       <Motion
         :class="isIframe ? 'mb-4' : ''"
         :initial="{
@@ -115,8 +112,8 @@
         class="lg:gap-y-8"
       >
         <Motion
-          v-for="(album, index) of albums"
-          :key="index"
+          v-for="album of albums"
+          :key="album.id"
           :initial="{
             scale: 1.1,
             opacity: 0,
@@ -240,7 +237,32 @@ const searchQuery = reactive({
   labels: [] as string[],
 });
 
-const { data: albums } = await useFetch("/api/albums", {
-  query: searchQuery,
+const albums = useState<
+  Awaited<ReturnType<typeof $fetch<unknown, "/api/albums">>>
+>(() => []);
+const hasMore = useState(() => true);
+
+const fetchNextAlbums = async () => {
+  const newAlbums = await useRequestFetch()("/api/albums", {
+    query: { ...searchQuery, offset: albums.value.length, limit: 20 },
+  });
+
+  if (newAlbums.length < 20) {
+    hasMore.value = false;
+  }
+
+  albums.value.push(...newAlbums);
+};
+
+const { reset: resetAlbums } = useInfiniteScroll(window, fetchNextAlbums, {
+  canLoadMore: () => hasMore.value,
 });
+
+watch(searchQuery, () => {
+  albums.value = [];
+  hasMore.value = true;
+  resetAlbums();
+});
+
+await callOnce(async () => fetchNextAlbums());
 </script>

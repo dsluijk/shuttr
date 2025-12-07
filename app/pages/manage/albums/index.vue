@@ -13,117 +13,168 @@
     <UPageBody>
       <UPageCard
         variant="subtle"
-        class="overflow-x-auto"
         :ui="{
-          container: 'p-0 sm:p-0',
+          container: 'p-0 sm:p-0 gap-y-0',
         }"
       >
-        <UTable
-          v-model:columnVisibility="columnVisibility"
-          :data="albums"
-          :columns="columns"
-          :loading="status === 'pending'"
+        <div
+          class="flex flex-wrap flex-col md:flex-row items-center justify-between gap-1.5 w-full m-auto px-4 py-3.5"
         >
-          <template #title-cell="{ row }">
-            <ULink :to="`/${row.getValue('slug')}`">
-              {{ row.getValue("title") }}
-            </ULink>
-          </template>
-
-          <template #sharingAllowed-cell="{ row }">
-            <UBadge
-              v-bind="
-                sharingProps[
-                  row.getValue('sharingAllowed') as keyof typeof sharingProps
-                ]
-              "
-              class="capitalize"
-              variant="subtle"
-            >
-              {{ row.getValue("sharingAllowed") ? "Yes" : "No" }}
-            </UBadge>
-          </template>
-
-          <template #visibility-cell="{ row }">
-            <UBadge
-              v-bind="
-                visibilityProps[
-                  row.getValue('visibility') as keyof typeof visibilityProps
-                ]
-              "
-              class="capitalize"
-              variant="subtle"
-            >
-              {{ row.getValue("visibility") }}
-            </UBadge>
-          </template>
-
-          <template #dates-cell="{ row }">
-            <NuxtTime
-              :datetime="row.getValue('startDate')"
-              year="numeric"
-              month="short"
-              day="numeric"
+          <div class="flex-1 w-full">
+            <UInput
+              v-model="searchQuery.search"
+              variant="soft"
+              icon="i-lucide-search"
+              placeholder="Search.."
+              class="w-full"
             />
-            <span v-if="row.getValue('startDate') !== row.getValue('endDate')">
-              &nbsp;-&nbsp;
-            </span>
-            <NuxtTime
-              v-if="row.getValue('startDate') !== row.getValue('endDate')"
-              :datetime="row.getValue('endDate')"
-              year="numeric"
-              month="short"
-              day="numeric"
-            />
-          </template>
+          </div>
 
-          <template #actions-cell="{ row }">
-            <UFieldGroup>
-              <UButton
-                icon="i-lucide-pencil"
-                color="neutral"
-                variant="soft"
-                size="sm"
-                :to="`/manage/albums/${row.getValue('slug')}`"
-              />
+          <div class="flex w-full md:w-auto flex-wrap items-center">
+            <USelectMenu
+              v-model="searchQuery.labels"
+              :items="labels"
+              :loading="labelsLoading"
+              valueKey="id"
+              labelKey="title"
+              placeholder="Select labels.."
+              variant="soft"
+              size="md"
+              class="w-full md:w-48 overflow-hidden"
+              multiple
+            >
+              <template #default="{ modelValue }">
+                <UBadge
+                  v-for="(label, index) of mapLabelIds(modelValue ?? [])"
+                  :key="index"
+                  size="sm"
+                  :variant="label?.style"
+                  class="truncate max-w-24"
+                >
+                  {{ label?.title ?? "Unknown" }}
+                </UBadge>
+              </template>
 
-              <UModal
-                title="Are you sure?"
-                :ui="{ footer: 'justify-end' }"
+              <template #item-label="{ item: label }">
+                <UBadge :variant="label.style">{{ label.title }}</UBadge>
+              </template>
+            </USelectMenu>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto grid">
+          <UTable
+            ref="table"
+            v-model:columnVisibility="columnVisibility"
+            :data="albums"
+            :columns="columns"
+            :loading="isLoading"
+            class="max-h-[60vh] h-full overflow-y-auto"
+            sticky
+          >
+            <template #title-cell="{ row }">
+              <ULink :to="`/${row.getValue('slug')}`">
+                {{ row.getValue("title") }}
+              </ULink>
+            </template>
+
+            <template #sharingAllowed-cell="{ row }">
+              <UBadge
+                v-bind="
+                  sharingProps[
+                    row.getValue('sharingAllowed') as keyof typeof sharingProps
+                  ]
+                "
+                class="capitalize"
+                variant="subtle"
               >
+                {{ row.getValue("sharingAllowed") ? "Yes" : "No" }}
+              </UBadge>
+            </template>
+
+            <template #visibility-cell="{ row }">
+              <UBadge
+                v-bind="
+                  visibilityProps[
+                    row.getValue('visibility') as keyof typeof visibilityProps
+                  ]
+                "
+                class="capitalize"
+                variant="subtle"
+              >
+                {{ row.getValue("visibility") }}
+              </UBadge>
+            </template>
+
+            <template #dates-cell="{ row }">
+              <NuxtTime
+                :datetime="row.getValue('startDate')"
+                year="numeric"
+                month="short"
+                day="numeric"
+              />
+              <span
+                v-if="row.getValue('startDate') !== row.getValue('endDate')"
+              >
+                &nbsp;-&nbsp;
+              </span>
+              <NuxtTime
+                v-if="row.getValue('startDate') !== row.getValue('endDate')"
+                :datetime="row.getValue('endDate')"
+                year="numeric"
+                month="short"
+                day="numeric"
+              />
+            </template>
+
+            <template #actions-cell="{ row }">
+              <UFieldGroup>
                 <UButton
-                  icon="i-lucide-trash"
-                  color="error"
+                  icon="i-lucide-pencil"
+                  color="neutral"
                   variant="soft"
                   size="sm"
+                  :to="`/manage/albums/${row.getValue('slug')}`"
                 />
 
-                <template #body>
-                  Do you really want to delete the album "{{
-                    row.getValue("title")
-                  }}" with it's photos? This action cannot be undone.
-                </template>
+                <UModal
+                  title="Are you sure?"
+                  :ui="{ footer: 'justify-end' }"
+                >
+                  <UButton
+                    icon="i-lucide-trash"
+                    color="error"
+                    variant="soft"
+                    size="sm"
+                  />
 
-                <template #footer="{ close }">
-                  <UFieldGroup>
-                    <UButton
-                      label="Delete"
-                      color="error"
-                      variant="soft"
-                      @click="() => deleteAlbum(row, close)"
-                    />
-                    <UButton
-                      label="Cancel"
-                      color="neutral"
-                      variant="soft"
-                      @click="close"
-                    />
-                  </UFieldGroup>
-                </template>
-              </UModal>
-            </UFieldGroup>
-          </template>
-        </UTable>
+                  <template #body>
+                    Do you really want to delete the album "{{
+                      row.getValue("title")
+                    }}" with it's photos? This action cannot be undone.
+                  </template>
+
+                  <template #footer="{ close }">
+                    <UFieldGroup>
+                      <UButton
+                        label="Delete"
+                        color="error"
+                        variant="soft"
+                        @click="() => deleteAlbum(row, close)"
+                      />
+                      <UButton
+                        label="Cancel"
+                        color="neutral"
+                        variant="soft"
+                        @click="close"
+                      />
+                    </UFieldGroup>
+                  </template>
+                </UModal>
+              </UFieldGroup>
+            </template>
+          </UTable>
+        </div>
       </UPageCard>
     </UPageBody>
   </div>
@@ -144,7 +195,54 @@ await authorize(editAlbums);
 
 const toast = useToast();
 
-const { data: albums, status } = await useFetch("/api/albums");
+const table = useTemplateRef("table");
+const { data: labels, pending: labelsLoading } = await useFetch("/api/labels");
+const mapLabelIds = (labelIds: string[]) =>
+  labelIds.map((labelId) =>
+    labels.value?.find((label) => label.id === labelId),
+  );
+
+const searchQuery = reactive({
+  search: "",
+  labels: [] as string[],
+});
+
+const albums = useState<
+  Awaited<ReturnType<typeof $fetch<unknown, "/api/albums">>>
+>(() => []);
+const hasMore = useState(() => true);
+const isLoading = useState(() => false);
+
+const fetchNextAlbums = async () => {
+  isLoading.value = true;
+  const newAlbums = await useRequestFetch()("/api/albums", {
+    query: { ...searchQuery, offset: albums.value.length, limit: 20 },
+  });
+  isLoading.value = false;
+
+  if (newAlbums.length < 20) {
+    hasMore.value = false;
+  }
+
+  albums.value.push(...newAlbums);
+};
+
+const { reset: resetAlbums } = useInfiniteScroll(
+  table as unknown as Ref<HTMLElement>,
+  fetchNextAlbums,
+  {
+    canLoadMore: () => hasMore.value && !isLoading.value,
+  },
+);
+
+watch(searchQuery, () => {
+  albums.value = [];
+  hasMore.value = true;
+  resetAlbums();
+});
+
+await callOnce(async () => fetchNextAlbums());
+
 type AlbumData = NonNullable<typeof albums.value>[number];
 
 const sharingProps = {
