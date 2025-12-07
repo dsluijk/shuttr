@@ -46,20 +46,10 @@
         :fileDelete="false"
         class="w-full"
         multiple
+        :ui="{
+          files: 'max-h-64 overflow-y-auto bg-elevated/50 p-2 rounded-lg',
+        }"
       >
-        <template #files="{ files: uploadFiles }">
-          <UPageCard
-            variant="subtle"
-            class="mt-4 max-h-64 overflow-y-auto"
-          >
-            <UProgress
-              v-model="uploaded"
-              :max="uploadFiles?.length"
-              size="lg"
-              status
-            />
-          </UPageCard>
-        </template>
       </UFileUpload>
 
       <UBlogPosts
@@ -184,7 +174,7 @@ useSeoMeta({
 });
 
 const limit = pLimit(2);
-const files = ref([]);
+const files = ref<File[]>([]);
 const uploaded = ref(0);
 
 const uploadFile = async (file: File) => {
@@ -202,6 +192,7 @@ const uploadFile = async (file: File) => {
   );
 
   if (uploadedPhoto) {
+    files.value = files.value.filter((listFile) => file !== listFile);
     album.value.photos.unshift(uploadedPhoto);
     uploaded.value++;
   }
