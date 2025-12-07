@@ -9,7 +9,10 @@ export default defineEventHandler(async (event) => {
     private: await allows(event, viewPrivateAlbums),
   };
 
-  const { search, labels } = await getValidatedQuery(event, querySchema.parse);
+  const { search, labels, limit, offset } = await getValidatedQuery(
+    event,
+    querySchema.parse,
+  );
 
   const db = useDrizzle();
   return await db
@@ -61,10 +64,14 @@ export default defineEventHandler(async (event) => {
       ),
     )
     .groupBy(tables.album.id, tables.photo.id)
-    .orderBy(desc(tables.album.startDate), desc(tables.album.createdAt));
+    .orderBy(desc(tables.album.startDate), desc(tables.album.createdAt))
+    .limit(limit)
+    .offset(offset);
 });
 
 const querySchema = z.object({
+  limit: z.coerce.number().multipleOf(1).min(1).max(20).default(20),
+  offset: z.coerce.number().multipleOf(1).nonnegative().default(0),
   search: z.string().max(60).optional(),
   labels: z.preprocess(
     (val) => (typeof val === "string" ? [val] : val),

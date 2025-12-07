@@ -192,11 +192,14 @@ const uploadFile = async (file: File) => {
 
   const form = new FormData();
   form.append("file", file);
-  const uploadedPhoto = await $fetch(`/api/albums/${album.value.slug}/photo`, {
-    method: "POST",
-    retry: 2,
-    body: form,
-  });
+  const uploadedPhoto = await useRequestFetch()(
+    `/api/albums/${album.value.slug}/photo`,
+    {
+      method: "POST",
+      retry: 2,
+      body: form,
+    },
+  );
 
   if (uploadedPhoto) {
     album.value.photos.unshift(uploadedPhoto);
@@ -213,12 +216,15 @@ watchArray(files, (_newFiles, _oldFiles, added) => {
 const setCoverPhoto = async (photoId: string) => {
   if (!album.value) return;
 
-  const newCover = await $fetch(`/api/albums/${album.value.slug}/cover`, {
-    method: "PUT",
-    body: {
-      photoId: photoId,
+  const newCover = await useRequestFetch()(
+    `/api/albums/${album.value.slug}/cover`,
+    {
+      method: "PUT",
+      body: {
+        photoId: photoId,
+      },
     },
-  });
+  );
 
   album.value.cover = newCover;
   toast.add({
@@ -232,7 +238,7 @@ const setCoverPhoto = async (photoId: string) => {
 const deletePhoto = async (photoId: string) => {
   if (!album.value) return;
 
-  await $fetch(`/api/albums/${album.value.slug}/photo/${photoId}`, {
+  await useRequestFetch()(`/api/albums/${album.value.slug}/photo/${photoId}`, {
     method: "DELETE",
   });
 
