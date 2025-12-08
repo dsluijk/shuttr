@@ -3,37 +3,7 @@
     <UPageHeader
       :title="album.title"
       headline="Editting Album"
-      :links="[
-        {
-          label: 'Back',
-          icon: 'i-lucide-arrow-left',
-          to: '/manage/albums',
-          variant: 'soft',
-        },
-        {
-          label: 'View',
-          icon: 'i-lucide-album',
-          to: `/${album.slug}`,
-          color: 'primary',
-          variant: 'soft',
-        },
-        !album.published
-          ? {
-              label: 'Publish',
-              icon: 'i-lucide-eye',
-              color: 'success',
-              variant: 'soft',
-              disabled: album?.photos.length == 0,
-              onClick: () => publishAlbum(true),
-            }
-          : {
-              label: 'Unpublish',
-              icon: 'i-lucide-eye-off',
-              color: 'warning',
-              variant: 'soft',
-              onClick: () => publishAlbum(false),
-            },
-      ]"
+      :links="actions"
     >
       <template #description>
         <span>{{ album.description }}</span>
@@ -65,8 +35,7 @@
         :ui="{
           files: 'max-h-64 overflow-y-auto bg-elevated/50 p-2 rounded-lg',
         }"
-      >
-      </UFileUpload>
+      />
 
       <UBlogPosts
         v-if="album.photos.length > 0"
@@ -169,6 +138,7 @@
 </template>
 
 <script setup lang="ts">
+import type { ButtonProps } from "@nuxt/ui";
 import pLimit from "p-limit";
 
 const route = useRoute();
@@ -181,6 +151,30 @@ const { data: album } = await useFetch(`/api/albums/${route.params.slug}`, {
 if (!album.value) {
   throw createError({ statusCode: 404, statusMessage: "Album Not Found" });
 }
+
+const actions = computed<ButtonProps[]>(() => [
+  {
+    label: "Back",
+    icon: "i-lucide-arrow-left",
+    to: "/manage/albums",
+    variant: "soft",
+  },
+  {
+    label: "View",
+    icon: "i-lucide-album",
+    to: `/${album.value?.slug}`,
+    color: "primary",
+    variant: "soft",
+  },
+  {
+    label: album.value?.published ? "Unpublish" : "Publish",
+    icon: album.value?.published ? "i-lucide-eye-off" : "i-lucide-eye",
+    color: album.value?.published ? "warning" : "success",
+    variant: "soft",
+    disabled: !album.value?.published && album.value?.photos.length == 0,
+    onClick: () => publishAlbum(),
+  },
+]);
 
 useSeoMeta({
   title: `Manage "${album.value.title}"`,
@@ -242,9 +236,10 @@ const setCoverPhoto = async (photoId: string) => {
   });
 };
 
-const publishAlbum = async (publish: boolean) => {
+const publishAlbum = async () => {
   if (!album.value) return;
 
+  const publish = !album.value.published;
   await useRequestFetch()(`/api/albums/${album.value.slug}/publish`, {
     method: publish ? "POST" : "DELETE",
   });
