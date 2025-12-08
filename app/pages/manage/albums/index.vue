@@ -73,22 +73,25 @@
             sticky
           >
             <template #title-cell="{ row }">
-              <ULink :to="`/${row.getValue('slug')}`">
+              <ULink
+                :to="`/${row.getValue('slug')}`"
+                class="w-48 inline-block truncate"
+              >
                 {{ row.getValue("title") }}
               </ULink>
             </template>
 
-            <template #sharingAllowed-cell="{ row }">
+            <template #published-cell="{ row }">
               <UBadge
                 v-bind="
-                  sharingProps[
-                    row.getValue('sharingAllowed') as keyof typeof sharingProps
+                  publishedProps[
+                    row.getValue('published') as keyof typeof publishedProps
                   ]
                 "
                 class="capitalize"
                 variant="subtle"
               >
-                {{ row.getValue("sharingAllowed") ? "Yes" : "No" }}
+                {{ row.getValue("published") ? "Published" : "Draft" }}
               </UBadge>
             </template>
 
@@ -216,7 +219,12 @@ const isLoading = useState(() => false);
 const fetchNextAlbums = async () => {
   isLoading.value = true;
   const newAlbums = await useRequestFetch()("/api/albums", {
-    query: { ...searchQuery, offset: albums.value.length, limit: 20 },
+    query: {
+      ...searchQuery,
+      offset: albums.value.length,
+      limit: 20,
+      unpublished: true,
+    },
   });
   isLoading.value = false;
 
@@ -245,9 +253,9 @@ await callOnce(async () => fetchNextAlbums());
 
 type AlbumData = NonNullable<typeof albums.value>[number];
 
-const sharingProps = {
-  true: { color: "success", icon: "i-lucide-check" } as const,
-  false: { color: "error", icon: "i-lucide-trash" } as const,
+const publishedProps = {
+  true: { color: "success", icon: "i-lucide-eye" } as const,
+  false: { color: "warning", icon: "i-lucide-pencil-line" } as const,
 } as const;
 
 const visibilityProps = {
@@ -272,8 +280,8 @@ const columns: TableColumn<AlbumData>[] = [
     header: "Title",
   },
   {
-    accessorKey: "sharingAllowed",
-    header: "Sharing Allowed",
+    accessorKey: "published",
+    header: "Status",
   },
   {
     accessorKey: "visibility",

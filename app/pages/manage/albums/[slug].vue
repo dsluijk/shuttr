@@ -12,11 +12,27 @@
         },
         {
           label: 'View',
-          icon: 'i-lucide-eye',
+          icon: 'i-lucide-album',
           to: `/${album.slug}`,
           color: 'primary',
           variant: 'soft',
         },
+        !album.published
+          ? {
+              label: 'Publish',
+              icon: 'i-lucide-eye',
+              color: 'success',
+              variant: 'soft',
+              disabled: album?.photos.length == 0,
+              onClick: () => publishAlbum(true),
+            }
+          : {
+              label: 'Unpublish',
+              icon: 'i-lucide-eye-off',
+              color: 'warning',
+              variant: 'soft',
+              onClick: () => publishAlbum(false),
+            },
       ]"
     >
       <template #description>
@@ -223,6 +239,22 @@ const setCoverPhoto = async (photoId: string) => {
     description: "The selected photo has been set as the cover.",
     icon: "i-lucide-spotlight",
     color: "success",
+  });
+};
+
+const publishAlbum = async (publish: boolean) => {
+  if (!album.value) return;
+
+  await useRequestFetch()(`/api/albums/${album.value.slug}/publish`, {
+    method: publish ? "POST" : "DELETE",
+  });
+
+  album.value.published = publish;
+  toast.add({
+    title: publish ? "Album Published" : "Album Unpublished",
+    description: `The album has been ${!publish ? "un" : ""}published. It is ${publish ? "now" : "no longer"} visible.`,
+    icon: publish ? "i-lucide-eye" : "i-lucide-eye-off",
+    color: publish ? "success" : "warning",
   });
 };
 

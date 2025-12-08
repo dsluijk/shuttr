@@ -43,6 +43,7 @@ export const album = pgTable(
     coverPhoto: cuid2(),
     startDate: date({ mode: "date" }).notNull(),
     endDate: date({ mode: "date" }).notNull(),
+    published: boolean().notNull().default(false),
     // Control the visibility of the album on the main page.
     visibility: albumVisibilityColumn().notNull(),
     // Whenether it's allowed to share the URL of the album.
