@@ -19,6 +19,13 @@ export default defineEventHandler(async (event) => {
     });
   }
 
+  if (album.published) {
+    throw createError({
+      statusCode: 404,
+      statusMessage: "Album was already published",
+    });
+  }
+
   if (album.photos.length === 0) {
     throw createError({
       statusCode: 400,
@@ -26,11 +33,20 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  return await db
+  const result = await db
     .update(tables.album)
     .set({ published: true })
     .where(eq(tables.album.id, album.id))
     .returning();
+
+  if (result.length == 0) {
+    throw createError({
+      statusCode: 404,
+      statusMessage: "Album not found",
+    });
+  }
+
+  return result[0];
 });
 
 const paramSchema = z.object({
