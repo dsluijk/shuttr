@@ -6,7 +6,7 @@ import {
   AlbumVisibility,
 } from "~~/server/database/schema/album";
 
-const atLeastRole = (minimum: UserRole, userRole: UserRole | null) => {
+const atLeastRole = (minimum: UserRole, userRole: UserRole | undefined) => {
   if (minimum === UserRole.GUEST && userRole) return true;
   if (
     minimum === UserRole.PUBLISHER
@@ -48,7 +48,12 @@ export const viewAlbum = defineAbility(
     user: User | null,
     album: typeof albumSchema.$inferSelect,
     allowPublic: boolean = false,
+    allowUnpublished: boolean = false,
   ) => {
+    if (!allowUnpublished && !atLeastRole(UserRole.PUBLISHER, user?.role)) {
+      return deny();
+    }
+
     if (allowPublic && album.sharingAllowed) {
       return allow();
     }
