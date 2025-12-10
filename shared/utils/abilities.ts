@@ -50,7 +50,7 @@ export const viewAlbum = defineAbility(
     allowPublic: boolean = false,
     allowUnpublished: boolean = false,
   ) => {
-    if (!allowUnpublished && !atLeastRole(UserRole.PUBLISHER, user?.role)) {
+    if (!album.published && !allowUnpublished && !atLeastRole(UserRole.PUBLISHER, user?.role)) {
       return deny();
     }
 
