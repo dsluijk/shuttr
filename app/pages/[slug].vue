@@ -30,16 +30,27 @@
         </span>
         <div
           v-if="album.albumLabels.length > 0"
-          class="mt-4"
+          class="flex mt-4 items-center justify-center"
         >
           <UBadge
             v-for="albumLabel of album.albumLabels"
             :key="albumLabel.labelId"
             :variant="albumLabel.label.style"
             size="lg"
+            class="mx-1"
           >
             {{ albumLabel.label.title }}
           </UBadge>
+          <UButton
+            icon="i-lucide-pencil"
+            color="neutral"
+            variant="soft"
+            size="sm"
+            :to="`/manage/albums/${album.slug}`"
+            class="mx-1"
+          >
+            Edit
+          </UButton>
         </div>
       </template>
     </AnimatedHero>

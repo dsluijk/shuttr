@@ -12,7 +12,8 @@
             v-for="albumLabel of album.albumLabels"
             :key="albumLabel.labelId"
             :variant="albumLabel.label.style"
-            size="xl"
+            size="lg"
+            class="mx-1"
           >
             {{ albumLabel.label.title }}
           </UBadge>

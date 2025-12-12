@@ -161,7 +161,10 @@
             </template>
 
             <template #badge>
-              <div v-if="album.albumLabels.length > 0">
+              <div
+                v-if="album.albumLabels.length > 0"
+                class="flex gap-1"
+              >
                 <UBadge
                   v-for="albumLabel of album.albumLabels"
                   :key="albumLabel.id"
