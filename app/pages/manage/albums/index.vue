@@ -138,7 +138,9 @@
                   variant="soft"
                   size="sm"
                   :to="`/manage/albums/${row.getValue('slug')}`"
-                />
+                >
+                  Edit
+                </UButton>
 
                 <UModal
                   title="Are you sure?"
@@ -149,7 +151,9 @@
                     color="error"
                     variant="soft"
                     size="sm"
-                  />
+                  >
+                    Delete
+                  </UButton>
 
                   <template #body>
                     Do you really want to delete the album "{{

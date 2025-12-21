@@ -12,7 +12,8 @@
             v-for="albumLabel of album.albumLabels"
             :key="albumLabel.labelId"
             :variant="albumLabel.label.style"
-            size="xl"
+            size="lg"
+            class="mx-1"
           >
             {{ albumLabel.label.title }}
           </UBadge>
@@ -21,6 +22,137 @@
     </UPageHeader>
 
     <UPageBody>
+      <UPageCard>
+        <UForm
+          :schema="schema"
+          :state="state"
+          class="space-y-4"
+          @submit="updateAlbum"
+        >
+          <UFormField
+            label="Title"
+            name="title"
+            required
+          >
+            <UInput
+              v-model="state.title"
+              placeholder="Trip to Tokyo"
+              variant="soft"
+              size="lg"
+              class="w-full"
+            />
+          </UFormField>
+
+          <UFormField
+            label="Description"
+            name="description"
+          >
+            <UTextarea
+              v-model="state.description"
+              placeholder="Add a description.."
+              variant="soft"
+              :maxrows="3"
+              size="lg"
+              autoresize
+              class="w-full"
+            />
+          </UFormField>
+
+          <UFormField
+            label="Album Date"
+            name="date"
+            required
+          >
+            <CalendarInput
+              v-model="state.date"
+              :maxValue="maxDate"
+            />
+          </UFormField>
+
+          <UFormField
+            label="Labels"
+            name="labels"
+          >
+            <USelectMenu
+              v-model="state.labels"
+              :items="labels"
+              :loading="labelsLoading"
+              valueKey="id"
+              labelKey="title"
+              createItem="always"
+              placeholder="Enter labels.."
+              variant="soft"
+              size="lg"
+              class="w-full"
+              multiple
+              @create="(labelTitle) => createLabel(labelTitle)"
+            >
+              <template #default="{ modelValue }">
+                <UBadge
+                  v-for="(label, index) of mapLabelIds(modelValue ?? [])"
+                  :key="index"
+                  size="sm"
+                  :variant="label?.style"
+                >
+                  {{ label?.title ?? "Unknown" }}
+                </UBadge>
+              </template>
+
+              <template #item-label="{ item: label }">
+                <UBadge :variant="label.style">{{ label.title }}</UBadge>
+              </template>
+            </USelectMenu>
+          </UFormField>
+
+          <UFormField
+            label="Visibility"
+            name="visibility"
+            required
+          >
+            <USelect
+              v-model="state.visibility"
+              :items="visibilityOptions"
+              variant="soft"
+              size="lg"
+              class="w-full"
+            />
+          </UFormField>
+
+          <UFormField
+            v-if="state.visibility !== 'public'"
+            label="Sharing Allowed"
+            name="sharingAllowed"
+          >
+            <UCheckbox
+              v-model="state.sharingAllowed"
+              label="Allow link sharing to view album"
+              size="lg"
+            />
+          </UFormField>
+
+          <div class="flex justify-end gap-2">
+            <UButton
+              :icon="album.published ? 'i-lucide-eye-off' : 'i-lucide-eye'"
+              :color="album.published ? 'warning' : 'success'"
+              variant="soft"
+              size="lg"
+              :disabled="!album.published && album.photos.length == 0"
+              @click="() => publishAlbum()"
+            >
+              {{ album.published ? "Unpublish" : "Publish" }}
+            </UButton>
+
+            <UButton
+              icon="i-lucide-save"
+              type="submit"
+              size="lg"
+            >
+              Save
+            </UButton>
+          </div>
+        </UForm>
+      </UPageCard>
+
       <UFileUpload
         v-model="files"
         label="Drop your image here to upload"
@@ -138,8 +270,10 @@
 </template>
 
 <script setup lang="ts">
-import type { ButtonProps } from "@nuxt/ui";
+import * as z from "zod";
 import pLimit from "p-limit";
+import type { ButtonProps, FormSubmitEvent } from "@nuxt/ui";
+import { CalendarDate, fromDate } from "@internationalized/date";
 
 const route = useRoute();
 const toast = useToast();
@@ -151,6 +285,10 @@ const { data: album } = await useFetch(`/api/albums/${route.params.slug}`, {
 if (!album.value) {
   throw createError({ statusCode: 404, statusMessage: "Album Not Found" });
 }
+
+const { data: labels, pending: labelsLoading } = await useFetch("/api/labels", {
+  deep: true,
+});
 
 const actions = computed<ButtonProps[]>(() => [
   {
@@ -166,14 +304,6 @@ const actions = computed<ButtonProps[]>(() => [
     color: "primary",
     variant: "soft",
   },
-  {
-    label: album.value?.published ? "Unpublish" : "Publish",
-    icon: album.value?.published ? "i-lucide-eye-off" : "i-lucide-eye",
-    color: album.value?.published ? "warning" : "success",
-    variant: "soft",
-    disabled: !album.value?.published && album.value?.photos.length == 0,
-    onClick: () => publishAlbum(),
-  },
 ]);
 
 useSeoMeta({
@@ -182,6 +312,79 @@ useSeoMeta({
   description: "Manage photo album",
   ogDescription: "Manage photo album",
 });
+
+const now = new Date();
+const maxDate = new CalendarDate(
+  now.getFullYear(),
+  now.getMonth() + 1,
+  now.getDate(),
+);
+
+const visibilityOptions = ref([
+  { label: "Public", value: "public", icon: "i-lucide-globe" },
+  { label: "Authenticated", value: "authenticated", icon: "i-lucide-users" },
+  { label: "Private", value: "private", icon: "i-lucide-lock" },
+]);
+
+const schema = z.object({
+  title: z
+    .string("A title is required")
+    .min(2, "Must be at least 4 characters")
+    .max(64, "Cannot be longer than 64 characters"),
+  description: z
+    .string("You must specify a description")
+    .max(512, "Cannot be longer than 512 characters"),
+  date: dateRangeValidator(true),
+  labels: z.array(z.cuid2()).max(4).default([]),
+  visibility: z.enum(visibilityOptions.value.map((opt) => opt.value)),
+  sharingAllowed: z.boolean(),
+});
+
+type SchemaIn = z.input<typeof schema>;
+type SchemaOut = z.output<typeof schema>;
+
+const state = shallowReactive<Partial<SchemaIn>>({
+  title: album.value.title,
+  description: album.value.description,
+  date: {
+    start: fromDate(new Date(album.value.startDate), "UTC"),
+    end: fromDate(new Date(album.value.endDate), "UTC"),
+  },
+  labels: album.value.albumLabels.map((label) => label.labelId),
+  visibility: album.value.visibility,
+  sharingAllowed: album.value.sharingAllowed,
+});
+
+const mapLabelIds = (labelIds: string[]) =>
+  labelIds.map((labelId) =>
+    labels.value?.find((label) => label.id === labelId),
+  );
+
+const updateAlbum = async (event: FormSubmitEvent<SchemaOut>) => {
+  const updatedAlbum = await useRequestFetch()(
+    `/api/albums/${album.value?.slug}`,
+    {
+      method: "PATCH",
+      body: event.data,
+    },
+  );
+
+  toast.add({
+    title: "Album updated",
+    description: `The album "${updatedAlbum?.title}" has been updated.`,
+    icon: "i-lucide-folder-check",
+    color: "success",
+  });
+
+  if (updatedAlbum.slug !== album.value?.slug) {
+    await navigateTo(`/manage/albums/${updatedAlbum?.slug}`);
+  }
+
+  album.value = {
+    ...updatedAlbum,
+    photos: album.value?.photos ?? [],
+  };
+};
 
 const limit = pLimit(2);
 const files = ref<File[]>([]);
@@ -269,5 +472,19 @@ const deletePhoto = async (photoId: string) => {
     icon: "i-lucide-thras",
     color: "error",
   });
+};
+
+const createLabel = async (labelTitle: string) => {
+  const createdLabel = await useRequestFetch()("/api/labels", {
+    method: "POST",
+    body: {
+      title: labelTitle,
+      style: "solid",
+    },
+  });
+
+  if (!createdLabel) return;
+  labels.value?.unshift(createdLabel);
+  state.labels?.push(createdLabel.id);
 };
 </script>
