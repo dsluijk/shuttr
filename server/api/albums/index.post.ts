@@ -60,9 +60,9 @@ export default defineEventHandler(async (event) => {
     }
     const createdAlbum = result[0];
 
-    let labelResult: (typeof albumLabels.$inferSelect)[] = [];
+    let albumLabelResult: (typeof albumLabels.$inferSelect)[] = [];
     if (existingLabels.length > 0) {
-      labelResult = await tx
+      albumLabelResult = await tx
         .insert(tables.albumLabels)
         .values(
           existingLabels.map((label) => ({
@@ -75,9 +75,11 @@ export default defineEventHandler(async (event) => {
 
     return {
       ...createdAlbum,
-      labels: labelResult.map((label) => ({
-        ...label,
-        label: existingLabels.find((existing) => label.labelId === existing.id),
+      albumLabels: albumLabelResult.map((albumLabel) => ({
+        ...albumLabel,
+        label: existingLabels.find(
+          (existing) => albumLabel.labelId === existing.id,
+        ),
       })),
     };
   });

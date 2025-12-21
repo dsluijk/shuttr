@@ -28,10 +28,7 @@
             day="numeric"
           />
         </span>
-        <div
-          v-if="album.albumLabels.length > 0"
-          class="flex mt-4 items-center justify-center"
-        >
+        <div class="flex mt-4 items-center justify-center">
           <UBadge
             v-for="albumLabel of album.albumLabels"
             :key="albumLabel.labelId"

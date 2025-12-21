@@ -272,7 +272,7 @@
 <script setup lang="ts">
 import * as z from "zod";
 import pLimit from "p-limit";
-import type { ButtonProps } from "@nuxt/ui";
+import type { ButtonProps, FormSubmitEvent } from "@nuxt/ui";
 import { CalendarDate, fromDate } from "@internationalized/date";
 
 const route = useRoute();
@@ -347,8 +347,8 @@ const state = shallowReactive<Partial<SchemaIn>>({
   title: album.value.title,
   description: album.value.description,
   date: {
-    start: fromDate(new Date(album.value.startDate)),
-    end: fromDate(new Date(album.value.endDate)),
+    start: fromDate(new Date(album.value.startDate), "UTC"),
+    end: fromDate(new Date(album.value.endDate), "UTC"),
   },
   labels: album.value.albumLabels.map((label) => label.labelId),
   visibility: album.value.visibility,
@@ -360,8 +360,30 @@ const mapLabelIds = (labelIds: string[]) =>
     labels.value?.find((label) => label.id === labelId),
   );
 
-const updateAlbum = () => {
-  console.log(state);
+const updateAlbum = async (event: FormSubmitEvent<SchemaOut>) => {
+  const updatedAlbum = await useRequestFetch()(
+    `/api/albums/${album.value?.slug}`,
+    {
+      method: "PATCH",
+      body: event.data,
+    },
+  );
+
+  toast.add({
+    title: "Album updated",
+    description: `The album "${updatedAlbum?.title}" has been updated.`,
+    icon: "i-lucide-folder-check",
+    color: "success",
+  });
+
+  if (updatedAlbum.slug !== album.value?.slug) {
+    await navigateTo(`/manage/albums/${updatedAlbum?.slug}`);
+  }
+
+  album.value = {
+    ...updatedAlbum,
+    photos: album.value?.photos ?? [],
+  };
 };
 
 const limit = pLimit(2);
@@ -450,5 +472,19 @@ const deletePhoto = async (photoId: string) => {
     icon: "i-lucide-thras",
     color: "error",
   });
+};
+
+const createLabel = async (labelTitle: string) => {
+  const createdLabel = await useRequestFetch()("/api/labels", {
+    method: "POST",
+    body: {
+      title: labelTitle,
+      style: "solid",
+    },
+  });
+
+  if (!createdLabel) return;
+  labels.value?.unshift(createdLabel);
+  state.labels?.push(createdLabel.id);
 };
 </script>
