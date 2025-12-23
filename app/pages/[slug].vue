@@ -79,15 +79,20 @@
           :inViewOptions="{ once: true }"
           asChild
         >
-          <PhotoModal :photo="photo">
-            <UnLazyImage
-              :src="`/photo/${album.id}/${photo.id}/thumb`"
-              :thumbhash="photo.thumbHash"
-              :style="`aspect-ratio: 4/${3 * getAspectRows(photo)}; grid-row: span ${getAspectRows(photo)};`"
-              :class="`h-full w-full object-cover rounded-lg`"
-            />
-          </PhotoModal>
+          <UnLazyImage
+            :src="`/photo/${album.id}/${photo.id}/thumb`"
+            :thumbhash="photo.thumbHash"
+            :style="`aspect-ratio: 4/${3 * getAspectRows(photo)}; grid-row: span ${getAspectRows(photo)};`"
+            :class="`h-full w-full object-cover rounded-lg`"
+            @click="() => (openPhoto = photo)"
+          />
         </Motion>
+
+        <PhotoModal
+          v-model="openPhoto"
+          @move-left="() => changeModal(true)"
+          @move-right="() => changeModal()"
+        />
       </UPageGrid>
 
       <UEmpty
@@ -103,6 +108,9 @@
 </template>
 
 <script setup lang="ts">
+import type { photo as Photo } from "~~/server/database/schema";
+import type { SerializeObject } from "nitropack";
+
 const route = useRoute();
 const { data: album } = await useFetch(`/api/albums/${route.params.slug}`);
 
@@ -123,5 +131,24 @@ useSeoMeta({
 
 const getAspectRows = (photo: (typeof album.value.photos)[number]) => {
   return Math.round(Math.max(photo.height / photo.width, 1));
+};
+
+const openPhoto = ref<
+  SerializeObject<Omit<typeof Photo.$inferSelect, "location">> | undefined
+>(undefined);
+
+const changeModal = (backwards: boolean = false) => {
+  if (openPhoto.value === undefined || album.value === undefined) return;
+
+  const offset = backwards ? -1 : 1;
+  const photoIndex = album.value.photos.findIndex(
+    (photo) => photo.id === openPhoto.value?.id,
+  );
+
+  const nextIndex =
+    (((photoIndex + offset) % album.value.photos.length)
+      + album.value.photos.length)
+    % album.value.photos.length;
+  openPhoto.value = album.value.photos[nextIndex];
 };
 </script>
