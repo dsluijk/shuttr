@@ -5,12 +5,12 @@
   >
     <template #body>
       <UButton
-        @click="moveLeft"
         icon="i-lucide-chevron-left"
         color="neutral"
         variant="ghost"
         size="xl"
         class="z-100 absolute left-4 md:left-8 xl:left-16 top-[50%] -translate-y-[50%]"
+        @click="moveLeft"
       />
 
       <UnLazyImage
@@ -25,12 +25,12 @@
       />
 
       <UButton
-        @click="moveRight"
         icon="i-lucide-chevron-right"
         color="neutral"
         variant="ghost"
         size="xl"
         class="z-100 absolute right-4 md:right-8 xl:right-16 top-[50%] -translate-y-[50%]"
+        @click="moveRight"
       />
     </template>
 
@@ -134,8 +134,8 @@ const moveRight = () => {
   emit("moveRight");
 };
 
-onKeyStroke("ArrowLeft", (e) => moveLeft());
-onKeyStroke("ArrowRight", (e) => moveRight());
+onKeyStroke("ArrowLeft", () => moveLeft());
+onKeyStroke("ArrowRight", () => moveRight());
 
 const dateTitle = computed(() => {
   if (!photo.value) {

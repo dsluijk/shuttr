@@ -80,18 +80,18 @@
           asChild
         >
           <UnLazyImage
-            @click="() => (openPhoto = photo)"
             :src="`/photo/${album.id}/${photo.id}/thumb`"
             :thumbhash="photo.thumbHash"
             :style="`aspect-ratio: 4/${3 * getAspectRows(photo)}; grid-row: span ${getAspectRows(photo)};`"
             :class="`h-full w-full object-cover rounded-lg`"
+            @click="() => (openPhoto = photo)"
           />
         </Motion>
 
         <PhotoModal
           v-model="openPhoto"
-          @moveLeft="() => changeModal(true)"
-          @moveRight="() => changeModal()"
+          @move-left="() => changeModal(true)"
+          @move-right="() => changeModal()"
         />
       </UPageGrid>
 
@@ -108,6 +108,9 @@
 </template>
 
 <script setup lang="ts">
+import type { photo as Photo } from "~~/server/database/schema";
+import type { SerializeObject } from "nitropack";
+
 const route = useRoute();
 const { data: album } = await useFetch(`/api/albums/${route.params.slug}`);
 
@@ -135,11 +138,11 @@ const openPhoto = ref<
 >(undefined);
 
 const changeModal = (backwards: boolean = false) => {
-  if (!openPhoto.value) return;
+  if (openPhoto.value === undefined || album.value === undefined) return;
 
   const offset = backwards ? -1 : 1;
   const photoIndex = album.value.photos.findIndex(
-    (photo) => photo.id === openPhoto.value.id,
+    (photo) => photo.id === openPhoto.value?.id,
   );
 
   const nextIndex =
