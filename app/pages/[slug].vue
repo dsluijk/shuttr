@@ -79,15 +79,20 @@
           :inViewOptions="{ once: true }"
           asChild
         >
-          <PhotoModal :photo="photo">
-            <UnLazyImage
-              :src="`/photo/${album.id}/${photo.id}/thumb`"
-              :thumbhash="photo.thumbHash"
-              :style="`aspect-ratio: 4/${3 * getAspectRows(photo)}; grid-row: span ${getAspectRows(photo)};`"
-              :class="`h-full w-full object-cover rounded-lg`"
-            />
-          </PhotoModal>
+          <UnLazyImage
+            @click="() => (openPhoto = photo)"
+            :src="`/photo/${album.id}/${photo.id}/thumb`"
+            :thumbhash="photo.thumbHash"
+            :style="`aspect-ratio: 4/${3 * getAspectRows(photo)}; grid-row: span ${getAspectRows(photo)};`"
+            :class="`h-full w-full object-cover rounded-lg`"
+          />
         </Motion>
+
+        <PhotoModal
+          v-model="openPhoto"
+          @moveLeft="() => changeModal(true)"
+          @moveRight="() => changeModal()"
+        />
       </UPageGrid>
 
       <UEmpty
@@ -123,5 +128,24 @@ useSeoMeta({
 
 const getAspectRows = (photo: (typeof album.value.photos)[number]) => {
   return Math.round(Math.max(photo.height / photo.width, 1));
+};
+
+const openPhoto = ref<
+  SerializeObject<Omit<typeof Photo.$inferSelect, "location">> | undefined
+>(undefined);
+
+const changeModal = (backwards: boolean = false) => {
+  if (!openPhoto.value) return;
+
+  const offset = backwards ? -1 : 1;
+  const photoIndex = album.value.photos.findIndex(
+    (photo) => photo.id === openPhoto.value.id,
+  );
+
+  const nextIndex =
+    (((photoIndex + offset) % album.value.photos.length)
+      + album.value.photos.length)
+    % album.value.photos.length;
+  openPhoto.value = album.value.photos[nextIndex];
 };
 </script>
