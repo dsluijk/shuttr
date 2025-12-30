@@ -1,6 +1,6 @@
 import { migrate } from "drizzle-orm/node-postgres/migrator";
 
-export default defineNitroPlugin(async (a) => {
+export default defineNitroPlugin(async () => {
   const db = useDrizzle();
 
   try {
