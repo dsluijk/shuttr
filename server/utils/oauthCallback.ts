@@ -18,8 +18,9 @@ export const handleOAuthCallback = async (
   providerUsed: ProviderEnum,
   oauthUser: OAuthCallbackUser,
   defaultRole: UserRole,
+  requireVerifiedEmail: boolean = true,
 ) => {
-  if (!oauthUser.email_verified) {
+  if (requireVerifiedEmail && !oauthUser.email_verified) {
     throw createError({
       statusCode: 403,
       message: "Your email is not verified by the provider.",
