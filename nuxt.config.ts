@@ -16,6 +16,10 @@ export default defineNuxtConfig({
 
   css: ["~/assets/css/main.css"],
 
+  ui: {
+    fonts: false,
+  },
+
   compatibilityDate: "2024-11-01",
 
   runtimeConfig: {

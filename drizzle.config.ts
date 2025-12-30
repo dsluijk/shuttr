@@ -2,6 +2,19 @@ import "dotenv/config";
 
 import { defineConfig } from "drizzle-kit";
 
+const dbCredentials = process.env.DATABASE_URL?.trim().length
+  ? {
+      url: process.env.DATABASE_URL,
+    }
+  : {
+      host: process.env.DATABASE_HOST || "localhost",
+      port: Number(process.env.DATABASE_HOST) || 5432,
+      user: process.env.DATABASE_USER || undefined,
+      password: process.env.DATABASE_PASSWORD || undefined,
+      database: process.env.DATABASE_DB || "drizzle",
+      ssl: process.env.DATABASE_SSL === "true",
+    };
+
 export default defineConfig({
   dialect: "postgresql",
   schema: "./server/database/schema/*",
@@ -11,12 +24,5 @@ export default defineConfig({
     table: "_drizzle_migrations",
     schema: "public",
   },
-  dbCredentials: {
-    host: process.env.DATABASE_HOST || "localhost",
-    port: Number(process.env.DATABASE_HOST) || 5432,
-    user: process.env.DATABASE_USER || undefined,
-    password: process.env.DATABASE_PASSWORD || undefined,
-    database: process.env.DATABASE_DB || "drizzle",
-    ssl: process.env.DATABASE_SSL === "true",
-  },
+  dbCredentials,
 });

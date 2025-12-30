@@ -35,7 +35,15 @@ export default defineEventHandler(async (event) => {
         role = UserRole.ADMIN;
       }
 
-      await handleOAuthCallback(event, ProviderEnum.AUTHENTIK, oauthUser, role);
+      // Authentik indicates that all emails are unverified by default.
+      // For now we will accept any email, although this is a security risk.
+      await handleOAuthCallback(
+        event,
+        ProviderEnum.AUTHENTIK,
+        oauthUser,
+        role,
+        false,
+      );
       return sendRedirect(event, "/");
     },
   })(event);
