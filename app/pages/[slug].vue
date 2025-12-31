@@ -214,8 +214,8 @@ const changeModal = (backwards: boolean = false) => {
 const { share, isSupported: shareSupported } = useShare();
 const shareAlbum = () => {
   share({
-    title: album.value.title,
-    text: `Check out the '${album.value.title}' album!`,
+    title: album.value?.title ?? "",
+    text: `Check out the '${album.value?.title ?? ""}' album!`,
     url: location.href,
   });
 };
