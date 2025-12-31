@@ -15,10 +15,11 @@
 
       <UnLazyImage
         v-if="photo"
+        ref="swipeTarget"
         :key="photo.id"
         :src="`/photo/${photo.album}/${photo.id}/large`"
         :thumbhash="photo.thumbHash"
-        :style="`aspect-ratio: ${photo.width}/${photo.height};`"
+        :style="`aspect-ratio: ${photo.width}/${photo.height}; opacity: ${opacity}; transform: translateX(${translation}px);`"
         class="h-full w-full m-auto object-contain"
         :height="photo.height"
         :width="photo.width"
@@ -136,6 +137,33 @@ const moveRight = () => {
 
 onKeyStroke("ArrowLeft", () => moveLeft());
 onKeyStroke("ArrowRight", () => moveRight());
+
+const swipeTarget = useTemplateRef<EventTarget>("swipeTarget");
+const { isSwiping, lengthX } = useSwipe(swipeTarget, {
+  passive: false,
+  onSwipeEnd(e: TouchEvent, direction) {
+    if (direction == "left") moveLeft();
+    if (direction == "right") moveRight();
+  },
+});
+
+const opacity = computed(() => {
+  if (!isSwiping.value) return 1;
+  const MAX_DIST = 100;
+  const MIN_OPACITY = 0.2;
+
+  const offset = Math.abs(lengthX.value);
+  const dist = 1 - Math.min(offset / MAX_DIST, 1);
+  return dist * (1 - MIN_OPACITY) + MIN_OPACITY;
+});
+
+const translation = computed(() => {
+  if (!isSwiping.value) return 0;
+  const SCALE = 0.05;
+  const MAX_DIST = 10;
+
+  return Math.max(Math.min(-lengthX.value * SCALE, MAX_DIST), -MAX_DIST);
+});
 
 const dateTitle = computed(() => {
   if (!photo.value) {
