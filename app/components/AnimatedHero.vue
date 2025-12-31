@@ -1,5 +1,9 @@
 <template>
-  <UPageHero>
+  <UPageHero
+    :ui="{
+      title: 'wrap-break-word',
+    }"
+  >
     <template #headline>
       <Motion
         class="w-full"
