@@ -145,6 +145,7 @@
             variant="ghost"
             :ui="{
               header: 'aspect-[4/3]',
+              title: 'truncate',
             }"
           >
             <template #header>
