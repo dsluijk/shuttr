@@ -53,47 +53,34 @@
     </AnimatedHero>
 
     <UPageBody class="mt-0">
-      <UPageGrid v-if="album.photos.length > 0">
-        <Motion
-          v-for="photo of album.photos"
-          :key="photo.id"
-          :initial="{
-            scale: 1.1,
-            opacity: 0,
-            transform: 'translateY(10px)',
-          }"
-          :animate="{
-            scale: 1.08,
-            opacity: 0.6,
-            transform: 'translateY(10px)',
-          }"
-          :whileInView="{
-            scale: 1,
-            opacity: 1,
-            transform: 'translateY(0)',
-          }"
-          :transition="{
-            duration: 0.2,
-            delay: 0.15,
-          }"
-          :inViewOptions="{ once: true }"
-          asChild
-        >
-          <UnLazyImage
-            :src="`/photo/${album.id}/${photo.id}/thumb`"
-            :thumbhash="photo.thumbHash"
-            :style="`aspect-ratio: 4/${3 * getAspectRows(photo)}; grid-row: span ${getAspectRows(photo)};`"
-            :class="`h-full w-full object-cover rounded-lg`"
-            @click="() => (openPhoto = photo)"
-          />
-        </Motion>
+      <UScrollArea
+        v-if="album.photos.length > 0"
+        ref="scrollArea"
+        v-slot="{ item: photo }"
+        :items="album.photos"
+        orientation="vertical"
+        :virtualize="{
+          lanes,
+          gap: 16,
+          estimateSize: (index: number) => {
+            if (!album) return 0;
+            const photo = album.photos[index];
+            if (!photo) return 0;
 
-        <PhotoModal
-          v-model="openPhoto"
-          @move-left="() => changeModal(true)"
-          @move-right="() => changeModal()"
+            const itemWidth = width > 0 ? width : photo.width;
+            const laneWidth = (itemWidth - 16 * (lanes - 1)) / lanes;
+            return (photo.height / photo.width) * laneWidth;
+          },
+        }"
+      >
+        <UnLazyImage
+          :src="`/photo/${album.id}/${photo.id}/thumb`"
+          :thumbhash="photo.thumbHash"
+          :style="`aspect-ratio: ${photo.width / photo.height};`"
+          class="h-full w-full object-cover rounded-lg"
+          @click="() => (openPhoto = photo)"
         />
-      </UPageGrid>
+      </UScrollArea>
 
       <UEmpty
         v-else
@@ -102,6 +89,12 @@
         icon="i-lucide-file-question-mark"
         title="No photos found"
         description="It looks like there aren't any photos in this album."
+      />
+
+      <PhotoModal
+        v-model="openPhoto"
+        @move-left="() => changeModal(true)"
+        @move-right="() => changeModal()"
       />
     </UPageBody>
   </UPage>
@@ -129,9 +122,12 @@ useSeoMeta({
   twitterCard: album.value.cover ? "summary_large_image" : undefined,
 });
 
-const getAspectRows = (photo: (typeof album.value.photos)[number]) => {
-  return Math.round(Math.max(photo.height / photo.width, 1));
-};
+const scrollArea = useTemplateRef("scrollArea");
+const { width } = useElementSize(() => scrollArea.value?.$el);
+
+const lanes = computed(() =>
+  Math.max(1, Math.min(4, Math.floor(width.value / 300))),
+);
 
 const openPhoto = ref<
   SerializeObject<Omit<typeof Photo.$inferSelect, "location">> | undefined
