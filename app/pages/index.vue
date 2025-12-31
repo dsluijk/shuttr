@@ -164,18 +164,18 @@
 
             <template #badge>
               <div class="flex w-full min-h-6">
-              <div
-                v-if="album.albumLabels.length > 0"
+                <div
+                  v-if="album.albumLabels.length > 0"
                   class="flex gap-2 overflow-hidden flex-wrap"
-              >
-                <UBadge
-                  v-for="albumLabel of album.albumLabels"
-                  :key="albumLabel.id"
-                  :variant="albumLabel.style"
-                  size="sm"
                 >
-                  {{ albumLabel.title }}
-                </UBadge>
+                  <UBadge
+                    v-for="albumLabel of album.albumLabels"
+                    :key="albumLabel.id"
+                    :variant="albumLabel.style"
+                    size="sm"
+                  >
+                    {{ albumLabel.title }}
+                  </UBadge>
                 </div>
               </div>
             </template>
