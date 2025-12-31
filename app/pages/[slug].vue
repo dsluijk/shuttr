@@ -28,26 +28,87 @@
             day="numeric"
           />
         </span>
-        <div class="flex mt-4 items-center justify-center">
-          <UBadge
-            v-for="albumLabel of album.albumLabels"
-            :key="albumLabel.labelId"
-            :variant="albumLabel.label.style"
-            size="lg"
-            class="mx-1"
-          >
-            {{ albumLabel.label.title }}
-          </UBadge>
-          <UButton
-            icon="i-lucide-pencil"
-            color="neutral"
-            variant="soft"
-            size="sm"
-            :to="`/manage/albums/${album.slug}`"
-            class="mx-1"
-          >
-            Edit
-          </UButton>
+        <div class="flex flex-col mt-4 items-center justify-center">
+          <div class="flex items-center justify-center">
+            <UBadge
+              v-for="albumLabel of album.albumLabels"
+              :key="albumLabel.labelId"
+              :variant="albumLabel.label.style"
+              size="lg"
+              class="mx-1"
+            >
+              {{ albumLabel.label.title }}
+            </UBadge>
+          </div>
+          <USeparator
+            v-if="album.albumLabels.length > 0"
+            class="my-3 max-w-64"
+          />
+          <div class="flex items-center justify-center">
+            <UBadge
+              v-if="!album.published"
+              icon="i-lucide-pencil-line"
+              color="warning"
+              variant="soft"
+              size="lg"
+              class="mx-1"
+            >
+              Draft
+            </UBadge>
+            <UBadge
+              v-if="album.visibility === 'public'"
+              icon="i-lucide-globe"
+              color="success"
+              variant="soft"
+              size="lg"
+              class="mx-1"
+            >
+              Public
+            </UBadge>
+            <UBadge
+              v-if="album.visibility === 'authenticated'"
+              icon="i-lucide-users"
+              color="warning"
+              variant="soft"
+              size="lg"
+              class="mx-1"
+            >
+              Authenticated
+            </UBadge>
+            <UBadge
+              v-if="album.visibility === 'private'"
+              icon="i-lucide-lock"
+              color="error"
+              variant="soft"
+              size="lg"
+              class="mx-1"
+            >
+              Private
+            </UBadge>
+            <UButton
+              v-if="canEditAlbums"
+              icon="i-lucide-pencil"
+              color="neutral"
+              variant="soft"
+              size="sm"
+              :to="`/manage/albums/${album.slug}`"
+              class="mx-1"
+            >
+              Edit
+            </UButton>
+            <ClientOnly>
+              <UButton
+                v-if="album.sharingAllowed && shareSupported"
+                icon="i-lucide-share-2"
+                variant="subtle"
+                size="sm"
+                class="mx-1"
+                @click="() => shareAlbum()"
+              >
+                Share
+              </UButton>
+            </ClientOnly>
+          </div>
         </div>
       </template>
     </AnimatedHero>
@@ -104,6 +165,8 @@
 import type { photo as Photo } from "~~/server/database/schema";
 import type { SerializeObject } from "nitropack";
 
+const canEditAlbums = await allows(editAlbums);
+
 const route = useRoute();
 const { data: album } = await useFetch(`/api/albums/${route.params.slug}`);
 
@@ -146,5 +209,14 @@ const changeModal = (backwards: boolean = false) => {
       + album.value.photos.length)
     % album.value.photos.length;
   openPhoto.value = album.value.photos[nextIndex];
+};
+
+const { share, isSupported: shareSupported } = useShare();
+const shareAlbum = () => {
+  share({
+    title: album.value.title,
+    text: `Check out the '${album.value.title}' album!`,
+    url: location.href,
+  });
 };
 </script>
