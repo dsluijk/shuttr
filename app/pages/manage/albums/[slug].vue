@@ -287,8 +287,8 @@ const { data: album } = await useFetch(`/api/albums/${route.params.slug}`, {
 });
 
 const photos = computed(() =>
-  (album.value.photos ?? []).toSorted(
-    (a, b) => new Date(a.dateTime) - new Date(b.dateTime),
+  (album.value?.photos ?? []).toSorted(
+    (a, b) => Date.parse(a.dateTime) - Date.parse(b.dateTime),
   ),
 );
 
