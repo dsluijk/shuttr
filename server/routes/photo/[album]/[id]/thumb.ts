@@ -10,6 +10,7 @@ export default defineEventHandler(async (event) => {
 
   let thumb = await storage.getItemRaw(`temp:photo:${album}:${id}:thumb`);
   if (thumb) {
+    setResponseHeader(event, "Content-Type", "image/webp");
     return thumb;
   }
 
@@ -24,6 +25,7 @@ export default defineEventHandler(async (event) => {
     .resize(400, 400, { fit: "outside" })
     .toBuffer();
 
+  setResponseHeader(event, "Content-Type", "image/webp");
   await storage.setItemRaw(`temp:photo:${album}:${id}:thumb`, thumb);
   return thumb;
 });

@@ -12,6 +12,7 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 404, message: "Photo not found." });
   }
 
+  setResponseHeader(event, "Content-Type", "image/webp");
   return Buffer.from(photo, "base64");
 });
 
