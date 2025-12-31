@@ -136,7 +136,7 @@
               :color="album.published ? 'warning' : 'success'"
               variant="soft"
               size="lg"
-              :disabled="!album.published && album.photos.length == 0"
+              :disabled="!album.published && photos.length == 0"
               @click="() => publishAlbum()"
             >
               {{ album.published ? "Unpublish" : "Publish" }}
@@ -167,14 +167,18 @@
         :ui="{
           files: 'max-h-64 overflow-y-auto bg-elevated/50 p-2 rounded-lg',
         }"
-      />
+      >
+        <template #file-leading>
+          <span />
+        </template>
+      </UFileUpload>
 
       <UBlogPosts
-        v-if="album.photos.length > 0"
+        v-if="photos.length > 0"
         class="lg:gap-y-4"
       >
         <Motion
-          v-for="photo of album.photos"
+          v-for="photo of photos"
           :key="photo.id"
           :initial="{
             scale: 1.1,
@@ -281,6 +285,12 @@ const toast = useToast();
 const { data: album } = await useFetch(`/api/albums/${route.params.slug}`, {
   deep: true,
 });
+
+const photos = computed(() =>
+  (album.value?.photos ?? []).toSorted(
+    (a, b) => Date.parse(a.dateTime) - Date.parse(b.dateTime),
+  ),
+);
 
 if (!album.value) {
   throw createError({ statusCode: 404, statusMessage: "Album Not Found" });
@@ -406,7 +416,7 @@ const uploadFile = async (file: File) => {
 
   if (uploadedPhoto) {
     files.value = files.value.filter((listFile) => file !== listFile);
-    album.value.photos.unshift(uploadedPhoto);
+    album.value.photos.push(uploadedPhoto);
     uploaded.value++;
   }
 };
