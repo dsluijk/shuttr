@@ -146,6 +146,7 @@
             :ui="{
               header: 'aspect-[4/3]',
               title: 'truncate',
+              meta: 'flex-col items-start',
             }"
           >
             <template #header>
@@ -162,18 +163,20 @@
             </template>
 
             <template #badge>
-              <div
-                v-if="album.albumLabels.length > 0"
-                class="flex gap-1"
-              >
-                <UBadge
-                  v-for="albumLabel of album.albumLabels"
-                  :key="albumLabel.id"
-                  :variant="albumLabel.style"
-                  size="sm"
+              <div class="flex w-full min-h-6">
+                <div
+                  v-if="album.albumLabels.length > 0"
+                  class="flex gap-2 overflow-hidden flex-wrap"
                 >
-                  {{ albumLabel.title }}
-                </UBadge>
+                  <UBadge
+                    v-for="albumLabel of album.albumLabels"
+                    :key="albumLabel.id"
+                    :variant="albumLabel.style"
+                    size="sm"
+                  >
+                    {{ albumLabel.title }}
+                  </UBadge>
+                </div>
               </div>
             </template>
           </UBlogPost>
