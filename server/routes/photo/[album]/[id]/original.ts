@@ -1,3 +1,4 @@
+import sharp from "sharp";
 import z from "zod";
 
 export default defineEventHandler(async (event) => {
@@ -7,14 +8,17 @@ export default defineEventHandler(async (event) => {
   );
   const storage = useStorage();
 
-  const photo = await storage.getItemRaw(
+  const photoEncoded = await storage.getItemRaw(
     `storage:photo:${album}:${id}:original`,
   );
-  if (!photo) {
+  if (!photoEncoded) {
     throw createError({ statusCode: 404, message: "Photo not found." });
   }
 
-  return Buffer.from(photo, "base64");
+  const photo = Buffer.from(photoEncoded, "base64");
+  const metadata = await sharp(photo).metadata();
+  setResponseHeader(event, "Content-Type", `image/${metadata.format}`);
+  return photo;
 });
 
 const paramSchema = z.object({
