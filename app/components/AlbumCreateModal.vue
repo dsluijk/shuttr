@@ -53,7 +53,7 @@
           name="date"
           required
         >
-          <CalendarInput
+          <InputCalendar
             v-model="state.date"
             :maxValue="maxDate"
           />
@@ -78,18 +78,18 @@
             @create="(labelTitle) => createLabel(labelTitle)"
           >
             <template #default="{ modelValue }">
-              <UBadge
+              <Label
                 v-for="(label, index) of mapLabelIds(modelValue ?? [])"
                 :key="index"
                 size="sm"
-                :variant="label?.style"
+                :model="label"
               >
                 {{ label?.title ?? "Unknown" }}
-              </UBadge>
+              </Label>
             </template>
 
-            <template #item-label="{ item: label }">
-              <UBadge :variant="label.style">{{ label.title }}</UBadge>
+            <template #item="{ item: label }">
+              <Label :model="label">{{ label.title }}</Label>
             </template>
           </USelectMenu>
         </UFormField>

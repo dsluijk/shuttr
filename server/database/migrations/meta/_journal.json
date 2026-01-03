@@ -99,6 +99,13 @@
       "when": 1765216111857,
       "tag": "0013_album-published",
       "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1767395477845,
+      "tag": "0014_pretty-labels",
+      "breakpoints": true
     }
   ]
 }

@@ -7,16 +7,15 @@
     >
       <template #description>
         <span>{{ album.description }}</span>
-        <div class="mt-4">
-          <UBadge
+        <div class="mt-4 flex">
+          <Label
             v-for="albumLabel of album.albumLabels"
             :key="albumLabel.labelId"
-            :variant="albumLabel.label.style"
-            size="lg"
+            :model="albumLabel.label"
             class="mx-1"
           >
             {{ albumLabel.label.title }}
-          </UBadge>
+          </Label>
         </div>
       </template>
     </UPageHeader>
@@ -63,7 +62,7 @@
             name="date"
             required
           >
-            <CalendarInput
+            <InputCalendar
               v-model="state.date"
               :maxValue="maxDate"
             />
@@ -88,18 +87,18 @@
               @create="(labelTitle) => createLabel(labelTitle)"
             >
               <template #default="{ modelValue }">
-                <UBadge
+                <Label
                   v-for="(label, index) of mapLabelIds(modelValue ?? [])"
                   :key="index"
                   size="sm"
-                  :variant="label?.style"
+                  :model="label"
                 >
                   {{ label?.title ?? "Unknown" }}
-                </UBadge>
+                </Label>
               </template>
 
-              <template #item-label="{ item: label }">
-                <UBadge :variant="label.style">{{ label.title }}</UBadge>
+              <template #item="{ item: label }">
+                <Label :model="label">{{ label.title }}</Label>
               </template>
             </USelectMenu>
           </UFormField>

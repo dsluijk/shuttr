@@ -88,19 +88,19 @@
               multiple
             >
               <template #default="{ modelValue }">
-                <UBadge
+                <Label
                   v-for="(label, index) of mapLabelIds(modelValue ?? [])"
                   :key="index"
+                  :model="label"
                   size="sm"
-                  :variant="label?.style"
                   class="truncate max-w-24"
                 >
                   {{ label?.title ?? "Unknown" }}
-                </UBadge>
+                </Label>
               </template>
 
-              <template #item-label="{ item: label }">
-                <UBadge :variant="label.style">{{ label.title }}</UBadge>
+              <template #item="{ item: label }">
+                <Label :model="label">{{ label.title }}</Label>
               </template>
             </USelectMenu>
           </div>
@@ -168,14 +168,14 @@
                   v-if="album.albumLabels.length > 0"
                   class="flex gap-2 overflow-hidden flex-wrap"
                 >
-                  <UBadge
+                  <Label
                     v-for="albumLabel of album.albumLabels"
                     :key="albumLabel.id"
-                    :variant="albumLabel.style"
+                    :model="albumLabel"
                     size="sm"
                   >
                     {{ albumLabel.title }}
-                  </UBadge>
+                  </Label>
                 </div>
               </div>
             </template>
