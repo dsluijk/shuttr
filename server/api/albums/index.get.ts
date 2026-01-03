@@ -32,7 +32,9 @@ export default defineEventHandler(async (event) => {
             distinct jsonb_build_object(
               'id', ${tables.label.id},
               'title', ${tables.label.title},
-              'style', ${tables.label.style}
+              'style', ${tables.label.style},
+              'color', ${tables.label.color},
+              'icon', ${tables.label.icon}
             )
           ) filter (where ${tables.label.id} is not null),
           '[]'

@@ -25,12 +25,12 @@
           :loading="status === 'pending'"
         >
           <template #title-cell="{ row }">
-            <UBadge
+            <Label
               size="lg"
-              :variant="row.getValue('style')"
+              :model="row.original"
             >
               {{ row.getValue("title") }}
-            </UBadge>
+            </Label>
           </template>
 
           <template #actions-cell="{ row }">
@@ -109,6 +109,7 @@ type LabelData = NonNullable<typeof labels.value>[number];
 
 const columnVisibility = ref({
   id: false,
+  style: false,
 });
 
 const columns: TableColumn<LabelData>[] = [

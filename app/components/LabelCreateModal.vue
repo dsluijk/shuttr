@@ -49,6 +49,20 @@
           />
         </UFormField>
 
+        <UFormField
+          label="Icon"
+          name="icon"
+        >
+          <InputIcon v-model="state.icon" />
+        </UFormField>
+
+        <UFormField
+          label="Color"
+          name="color"
+        >
+          <InputColor v-model="state.color" />
+        </UFormField>
+
         <UButton
           type="submit"
           block
@@ -59,12 +73,12 @@
         <USeparator label="Preview" />
 
         <div class="flex justify-center">
-          <UBadge
+          <Label
+            :model="state"
             size="lg"
-            :variant="state.style"
           >
             {{ state.title || "Beach" }}
-          </UBadge>
+          </Label>
         </div>
       </UForm>
     </template>
@@ -97,14 +111,18 @@ const schema = z.object({
     .min(2, "Must be at least 2 characters")
     .max(24, "Cannot be longer than 24 characters"),
   style: z.enum(LabelStyle),
+  icon: z.string().optional(),
+  color: readableColorValidator().optional(),
 });
 
 type SchemaIn = z.input<typeof schema>;
 type SchemaOut = z.output<typeof schema>;
 
-const state = shallowReactive<Partial<SchemaIn>>({
+const state = reactive<Partial<SchemaIn>>({
   title: "",
   style: LabelStyle.SOLID,
+  icon: undefined,
+  color: undefined,
 });
 
 const createLabel = async (event: FormSubmitEvent<SchemaOut>) => {

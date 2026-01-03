@@ -30,15 +30,15 @@
         </span>
         <div class="flex flex-col mt-4 items-center justify-center">
           <div class="flex items-center justify-center">
-            <UBadge
+            <Label
               v-for="albumLabel of album.albumLabels"
               :key="albumLabel.labelId"
-              :variant="albumLabel.label.style"
+              :model="albumLabel.label"
               size="lg"
               class="mx-1"
             >
               {{ albumLabel.label.title }}
-            </UBadge>
+            </Label>
           </div>
           <USeparator
             v-if="album.albumLabels.length > 0"

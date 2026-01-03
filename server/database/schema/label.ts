@@ -1,4 +1,4 @@
-import { pgEnum, pgTable, varchar } from "drizzle-orm/pg-core";
+import { char, pgEnum, pgTable, text, varchar } from "drizzle-orm/pg-core";
 import { cuid2, enumToPgEnum } from "./utils";
 import { relations } from "drizzle-orm";
 import { albumLabels } from "./albumLabels";
@@ -9,13 +9,14 @@ export enum LabelStyle {
   SOFT = "soft",
   SUBTLE = "subtle",
 }
-
 export const labelStyleColumn = pgEnum("label_style", enumToPgEnum(LabelStyle));
 
 export const label = pgTable("label", {
   id: cuid2().primaryKey(),
   title: varchar({ length: 24 }).unique().notNull(),
   style: labelStyleColumn().default(LabelStyle.SOLID).notNull(),
+  icon: text(),
+  color: char({ length: 7 }),
 });
 
 export const labelRelations = relations(label, ({ many }) => ({

@@ -44,19 +44,19 @@
               multiple
             >
               <template #default="{ modelValue }">
-                <UBadge
+                <Label
                   v-for="(label, index) of mapLabelIds(modelValue ?? [])"
                   :key="index"
+                  :model="label"
                   size="sm"
-                  :variant="label?.style"
                   class="truncate max-w-24"
                 >
                   {{ label?.title ?? "Unknown" }}
-                </UBadge>
+                </Label>
               </template>
 
-              <template #item-label="{ item: label }">
-                <UBadge :variant="label.style">{{ label.title }}</UBadge>
+              <template #item="{ item: label }">
+                <Label :model="label">{{ label.title }}</Label>
               </template>
             </USelectMenu>
           </div>
