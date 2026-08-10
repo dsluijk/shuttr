@@ -61,3 +61,4 @@ Basic setup is done through environmental variables.
 | `NUXT_STORAGE_S3_BUCKET`                | _None_      | NO           | The S3 bucket to use. Only applicable with storage type `s3`.                                                  |
 | `NUXT_STORAGE_S3_ENDPOINT`              | _None_      | NO           | The endpoint of the S3 service. Only applicable with storage type `s3`.                                        |
 | `NUXT_STORAGE_S3_REGION`                | _None_      | NO           | The S3 region to use. Only applicable with storage type `s3`.                                                  |
+| `NUXT_DEBUG_TIMINGS`                    | `false`     | NO           | Log per-section timings for uploads and photo routes, and expose them as a `Server-Timing` response header.     |
