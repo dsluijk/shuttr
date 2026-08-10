@@ -1,10 +1,9 @@
-export const createDigest = async (
-  buffer: Uint8Array | ArrayBuffer,
-): Promise<string> => {
-  const hashBuffer = await crypto.subtle.digest(
-    "SHA-256",
-    buffer as BufferSource,
+import { hash } from "node:crypto";
+
+export const createDigest = (buffer: Uint8Array | ArrayBuffer): string => {
+  return hash(
+    "sha256",
+    ArrayBuffer.isView(buffer) ? buffer : new Uint8Array(buffer),
+    "hex",
   );
-  const hashArray = Array.from(new Uint8Array(hashBuffer));
-  return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
 };

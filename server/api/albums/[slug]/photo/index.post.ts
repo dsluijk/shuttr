@@ -1,5 +1,3 @@
-import { rgbaToThumbHash } from "thumbhash";
-
 import exifReader from "exifreader";
 import sharp from "sharp";
 import dayjs from "dayjs";
@@ -100,26 +98,8 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const large = await timings.time("encode", () =>
-    sharp(data)
-      .webp({ effort: 2 })
-      .autoOrient()
-      .resize(2000, 2000, { fit: "inside", withoutEnlargement: true })
-      .toBuffer(),
-  );
-
-  const { data: thumb, info: thumbInfo } = await timings.time("thumbhash", () =>
-    sharp(large)
-      .raw()
-      .ensureAlpha()
-      .resize(32, 32, { fit: "outside", kernel: "linear" })
-      .toBuffer({ resolveWithObject: true }),
-  );
-
+  const thumbHash = await timings.time("thumbhash", () => createThumbHash(data));
   const [dateTime, offsetTime] = getDate(tags.exif);
-  const thumbHash = Buffer.from(
-    rgbaToThumbHash(thumbInfo.width, thumbInfo.height, thumb),
-  ).toString("base64");
 
   const result = await timings.time("db-insert", () =>
     db
@@ -160,13 +140,14 @@ export default defineEventHandler(async (event) => {
   const photo = result[0];
   const storage = useStorage();
   await timings.time("store", () =>
-    Promise.all([
-      storage.setItemRaw(`storage:photo:${album.id}:${photo.id}:large`, large),
-      storage.setItemRaw(
-        `storage:photo:${album.id}:${photo.id}:original`,
-        data,
-      ),
-    ]),
+    storage.setItemRaw(storedKey(album.id, photo.id, "original"), data),
+  );
+
+  event.waitUntil(
+    storeDerivatives(album.id, photo.id, data).catch((e) => {
+      console.error(`Failed to derive photo ${photo.id}!`);
+      console.error(e);
+    }),
   );
 
   return photo;

@@ -5,18 +5,11 @@ export default defineEventHandler(async (event) => {
     event,
     paramSchema.parse,
   );
-  const timings = useTimings(event);
-  const storage = useStorage();
 
-  const photo = await timings.time("fetch", () =>
-    storage.getItemRaw(`storage:photo:${album}:${id}:large`),
-  );
-  if (!photo) {
-    throw createError({ statusCode: 404, message: "Photo not found." });
-  }
+  const large = await resolvePhoto(event, album, id, "large");
 
-  setResponseHeader(event, "Content-Type", "image/webp");
-  return Buffer.from(photo, "base64");
+  setPhotoHeaders(event, "image/webp");
+  return large;
 });
 
 const paramSchema = z.object({
