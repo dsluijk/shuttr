@@ -46,9 +46,10 @@ export default defineEventHandler(async (event) => {
   const storage = useStorage();
 
   for (const storageKey of [
-    `storage:photo:${album.id}:${photo.id}:large`,
-    `storage:photo:${album.id}:${photo.id}:original`,
-    `temp:photo:${album.id}:${photo.id}:thumb`,
+    storedKey(album.id, photo.id, "large"),
+    storedKey(album.id, photo.id, "original"),
+    storedKey(album.id, photo.id, "thumb"),
+    cacheKey(album.id, photo.id, "thumb"),
   ]) {
     if (!(await storage.has(storageKey))) {
       continue;
