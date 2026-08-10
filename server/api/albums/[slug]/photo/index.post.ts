@@ -10,14 +10,21 @@ import z from "zod";
 
 import { PhotoType } from "~~/server/database/schema/photo";
 
+const MAX_SIZE = 50 * 1024 * 1024;
+
 export default defineEventHandler(async (event) => {
   await authorize(event, editAlbums);
 
   const { slug } = await getValidatedRouterParams(event, paramSchema.parse);
+  const { filename } = await getValidatedQuery(event, querySchema.parse);
+  const timings = useTimings(event);
   const db = useDrizzle();
-  const album = await db.query.album.findFirst({
-    where: (album, { eq }) => eq(album.slug, slug),
-  });
+
+  const album = await timings.time("db-lookup", () =>
+    db.query.album.findFirst({
+      where: (album, { eq }) => eq(album.slug, slug),
+    }),
+  );
 
   if (!album) {
     throw createError({
@@ -26,44 +33,32 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const form = await readMultipartFormData(event);
-  if (form === undefined || form[0] === undefined || form[0].name !== "file") {
+  const contentLength = Number(getRequestHeader(event, "content-length"));
+  if (contentLength > MAX_SIZE) {
+    throw createError({
+      statusCode: 413,
+      statusMessage: "Image too large",
+    });
+  }
+
+  const data = await timings.time("read", () => readRawBody(event, false));
+  if (!data || data.byteLength === 0) {
     throw createError({
       statusCode: 400,
       statusMessage: "No file uploaded.",
     });
   }
 
-  if (form.length > 1) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: "Too much form data attached.",
-    });
-  }
-
-  const file = form[0];
-  if (file.filename === undefined) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: "No filename set.",
-    });
-  }
-
-  if (file.filename.length > 100) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: "Filename too long.",
-    });
-  }
-
-  const originalDigest = await createDigest(new Uint8Array(file.data).buffer);
-  const existingPhotos = await db.query.photo.findMany({
-    where: (photo, { and, eq }) =>
-      and(eq(photo.album, album.id), eq(photo.originalDigest, originalDigest)),
-    columns: {
-      location: false,
-    },
-  });
+  const originalDigest = await timings.time("hash", () => createDigest(data));
+  const existingPhotos = await timings.time("db-lookup", () =>
+    db.query.photo.findMany({
+      where: (photo, { and, eq }) =>
+        and(eq(photo.album, album.id), eq(photo.originalDigest, originalDigest)),
+      columns: {
+        location: false,
+      },
+    }),
+  );
   if (existingPhotos.length > 0) {
     throw createError({
       statusCode: 400,
@@ -71,17 +66,19 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const metadata = await sharp(file.data).metadata();
+  const metadata = await timings.time("decode", () => sharp(data).metadata());
   const { width, height } = metadata.autoOrient;
+  const { format } = metadata;
+  const size = metadata.size ?? data.byteLength;
 
-  if ((metadata.size ?? file.data.byteLength) > 50 * 1024 * 1024) {
+  if (size > MAX_SIZE) {
     throw createError({
       statusCode: 400,
       statusMessage: "Image too large",
     });
   }
 
-  if (metadata.format !== "jpeg") {
+  if (format !== "jpeg") {
     throw createError({
       statusCode: 400,
       statusMessage: "Invalid image format",
@@ -90,10 +87,12 @@ export default defineEventHandler(async (event) => {
 
   let tags;
   try {
-    tags = exifReader.load(file.data, {
-      includeUnknown: true,
-      expanded: true,
-    });
+    tags = await timings.time("exif", () =>
+      exifReader.load(data, {
+        includeUnknown: true,
+        expanded: true,
+      }),
+    );
   } catch {
     throw createError({
       statusCode: 400,
@@ -101,49 +100,55 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const large = await sharp(file.data)
-    .webp()
-    .autoOrient()
-    .resize(2000, 2000, { fit: "inside", withoutEnlargement: true })
-    .toBuffer();
+  const large = await timings.time("encode", () =>
+    sharp(data)
+      .webp({ effort: 2 })
+      .autoOrient()
+      .resize(2000, 2000, { fit: "inside", withoutEnlargement: true })
+      .toBuffer(),
+  );
 
-  const { data: thumb, info: thumbInfo } = await sharp(large)
-    .raw()
-    .ensureAlpha()
-    .resize(32, 32, { fit: "outside", kernel: "linear" })
-    .toBuffer({ resolveWithObject: true });
+  const { data: thumb, info: thumbInfo } = await timings.time("thumbhash", () =>
+    sharp(large)
+      .raw()
+      .ensureAlpha()
+      .resize(32, 32, { fit: "outside", kernel: "linear" })
+      .toBuffer({ resolveWithObject: true }),
+  );
 
   const [dateTime, offsetTime] = getDate(tags.exif);
   const thumbHash = Buffer.from(
     rgbaToThumbHash(thumbInfo.width, thumbInfo.height, thumb),
   ).toString("base64");
 
-  const result = await db
-    .insert(tables.photo)
-    .values({
-      album: album.id,
-      type: PhotoType[metadata.format],
-      fileName: file.filename,
-      originalDigest,
-      thumbHash,
-      size: metadata.size ?? file.data.byteLength,
-      width,
-      height,
-      dateTime,
-      offsetTime,
-      cameraMake: readTag(tags.exif, "Make"),
-      cameraModel: readTag(tags.exif, "Model"),
-      lens: readTag(tags.exif, "LensModel"),
-      flash: readTag(tags.exif, "Flash"),
-      iso: Number(readTag(tags.exif, "ISOSpeedRatings")) || undefined,
-      focalLength: readTag(tags.exif, "FocalLength"),
-      fNumber: readTag(tags.exif, "FNumber"),
-      exposureTime: readTag(tags.exif, "ExposureTime"),
-      software: readTag(tags.exif, "Software"),
-      copyright: readTag(tags.exif, "Copyright"),
-      location: readLocation(tags.gps),
-    })
-    .returning();
+  const result = await timings.time("db-insert", () =>
+    db
+      .insert(tables.photo)
+      .values({
+        album: album.id,
+        type: PhotoType[format],
+        fileName: filename,
+        originalDigest,
+        thumbHash,
+        size,
+        width,
+        height,
+        dateTime,
+        offsetTime,
+        cameraMake: readTag(tags.exif, "Make"),
+        cameraModel: readTag(tags.exif, "Model"),
+        lens: readTag(tags.exif, "LensModel"),
+        flash: readTag(tags.exif, "Flash"),
+        iso: Number(readTag(tags.exif, "ISOSpeedRatings")) || undefined,
+        focalLength: readTag(tags.exif, "FocalLength"),
+        fNumber: readTag(tags.exif, "FNumber"),
+        exposureTime: readTag(tags.exif, "ExposureTime"),
+        software: readTag(tags.exif, "Software"),
+        copyright: readTag(tags.exif, "Copyright"),
+        location: readLocation(tags.gps),
+      })
+      .returning(),
+  );
 
   if (result.length !== 1 || result[0] === undefined) {
     throw createError({
@@ -154,13 +159,14 @@ export default defineEventHandler(async (event) => {
 
   const photo = result[0];
   const storage = useStorage();
-  await storage.setItemRaw(
-    `storage:photo:${album.id}:${photo.id}:large`,
-    large,
-  );
-  await storage.setItemRaw(
-    `storage:photo:${album.id}:${photo.id}:original`,
-    file.data,
+  await timings.time("store", () =>
+    Promise.all([
+      storage.setItemRaw(`storage:photo:${album.id}:${photo.id}:large`, large),
+      storage.setItemRaw(
+        `storage:photo:${album.id}:${photo.id}:original`,
+        data,
+      ),
+    ]),
   );
 
   return photo;
@@ -168,6 +174,10 @@ export default defineEventHandler(async (event) => {
 
 const paramSchema = z.object({
   slug: z.string().min(4),
+});
+
+const querySchema = z.object({
+  filename: z.string().min(1).max(100),
 });
 
 const readTag = <T extends object>(

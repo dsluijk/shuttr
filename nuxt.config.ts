@@ -23,6 +23,9 @@ export default defineNuxtConfig({
   compatibilityDate: "2024-11-01",
 
   runtimeConfig: {
+    debug: {
+      timings: false,
+    },
     oauth: {
       authentik: {
         displayName: "Authentik",

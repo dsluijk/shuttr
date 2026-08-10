@@ -403,14 +403,14 @@ const uploaded = ref(0);
 const uploadFile = async (file: File) => {
   if (!album.value) return;
 
-  const form = new FormData();
-  form.append("file", file);
   const uploadedPhoto = await useRequestFetch()(
     `/api/albums/${album.value.slug}/photo`,
     {
       method: "POST",
       retry: 2,
-      body: form,
+      query: { filename: file.name },
+      headers: { "content-type": file.type || "application/octet-stream" },
+      body: file,
     },
   );
 

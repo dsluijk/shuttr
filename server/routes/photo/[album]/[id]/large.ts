@@ -5,9 +5,12 @@ export default defineEventHandler(async (event) => {
     event,
     paramSchema.parse,
   );
+  const timings = useTimings(event);
   const storage = useStorage();
 
-  const photo = await storage.getItemRaw(`storage:photo:${album}:${id}:large`);
+  const photo = await timings.time("fetch", () =>
+    storage.getItemRaw(`storage:photo:${album}:${id}:large`),
+  );
   if (!photo) {
     throw createError({ statusCode: 404, message: "Photo not found." });
   }

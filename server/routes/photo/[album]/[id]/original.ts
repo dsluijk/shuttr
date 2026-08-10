@@ -6,17 +6,18 @@ export default defineEventHandler(async (event) => {
     event,
     paramSchema.parse,
   );
+  const timings = useTimings(event);
   const storage = useStorage();
 
-  const photoEncoded = await storage.getItemRaw(
-    `storage:photo:${album}:${id}:original`,
+  const photoEncoded = await timings.time("fetch", () =>
+    storage.getItemRaw(`storage:photo:${album}:${id}:original`),
   );
   if (!photoEncoded) {
     throw createError({ statusCode: 404, message: "Photo not found." });
   }
 
   const photo = Buffer.from(photoEncoded, "base64");
-  const metadata = await sharp(photo).metadata();
+  const metadata = await timings.time("decode", () => sharp(photo).metadata());
   setResponseHeader(event, "Content-Type", `image/${metadata.format}`);
   return photo;
 });
