@@ -13,7 +13,7 @@
     pname = "shuttr";
     version = "0.0.1";
     src = nixpkgs.lib.cleanSource ./.;
-    hash = "sha256-DhRklNaMqueHDf/5HyNYmLQwD6pSjwLdUi83JUR69kY=";
+    hash = "sha256-2zqivc7yzu0o7fi+k1GTfJC28+fSu0ntFqzL0ko+juQ=";
 
     genSystems = nixpkgs.lib.genAttrs [
       "aarch64-linux"

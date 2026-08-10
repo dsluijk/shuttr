@@ -98,7 +98,7 @@ const bodySchema = z.object({
     .object({
       start: z.coerce
         .date()
-        .max(new Date())
+        .refine((date) => date <= new Date(), "Date cannot be in the future.")
         .refine(
           (date) =>
             date.getUTCHours() === 0
@@ -108,7 +108,7 @@ const bodySchema = z.object({
         ),
       end: z.coerce
         .date()
-        .max(new Date())
+        .refine((date) => date <= new Date(), "Date cannot be in the future.")
         .refine(
           (date) =>
             date.getUTCHours() === 0

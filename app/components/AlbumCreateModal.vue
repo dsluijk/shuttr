@@ -134,6 +134,7 @@
 <script setup lang="ts">
 import * as z from "zod";
 import type { FormSubmitEvent } from "@nuxt/ui";
+import type { DateRange } from "reka-ui";
 import { CalendarDate } from "@internationalized/date";
 
 const toast = useToast();
@@ -169,7 +170,7 @@ const schema = z.object({
   sharingAllowed: z.boolean(),
 });
 
-type SchemaIn = z.input<typeof schema>;
+type SchemaIn = Omit<z.input<typeof schema>, "date"> & { date: DateRange };
 type SchemaOut = z.output<typeof schema>;
 
 const state = shallowReactive<Partial<SchemaIn>>({

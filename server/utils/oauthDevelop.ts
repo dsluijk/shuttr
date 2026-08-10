@@ -1,5 +1,5 @@
 import type { H3Event } from "h3";
-import { eventHandler, getQuery, sendRedirect } from "h3";
+import { createError, eventHandler, getQuery, sendRedirect } from "h3";
 import { withQuery } from "ufo";
 import { defu } from "defu";
 import { snakeCase, upperFirst } from "scule";

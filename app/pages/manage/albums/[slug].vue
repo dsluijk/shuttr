@@ -276,6 +276,7 @@
 import * as z from "zod";
 import pLimit from "p-limit";
 import type { ButtonProps, FormSubmitEvent } from "@nuxt/ui";
+import type { DateRange } from "reka-ui";
 import { CalendarDate, fromDate } from "@internationalized/date";
 
 const route = useRoute();
@@ -349,7 +350,7 @@ const schema = z.object({
   sharingAllowed: z.boolean(),
 });
 
-type SchemaIn = z.input<typeof schema>;
+type SchemaIn = Omit<z.input<typeof schema>, "date"> & { date: DateRange };
 type SchemaOut = z.output<typeof schema>;
 
 const state = shallowReactive<Partial<SchemaIn>>({
