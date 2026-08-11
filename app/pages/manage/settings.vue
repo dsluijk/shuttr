@@ -117,6 +117,7 @@
         description="Shown on the main page and in the footer."
         variant="subtle"
         :ui="{
+          container: 'min-w-0',
           wrapper: 'flex-row items-center justify-between gap-4',
           footer: 'pt-0 mt-0',
         }"
@@ -134,7 +135,7 @@
         </template>
 
         <div
-          class="overflow-x-auto"
+          class="min-w-0"
           @dragover="dragOver"
           @drop="drop"
         >
