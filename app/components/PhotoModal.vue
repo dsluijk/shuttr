@@ -13,17 +13,28 @@
         @click="moveLeft"
       />
 
-      <UnLazyImage
-        v-if="photo"
-        ref="swipeTarget"
-        :key="photo.id"
-        :src="`/photo/${photo.album}/${photo.id}/large`"
-        :thumbhash="photo.thumbHash"
-        :style="`aspect-ratio: ${photo.width}/${photo.height}; opacity: ${opacity}; transform: translateX(${translation}px);`"
-        class="h-full w-full m-auto object-contain"
-        :height="photo.height"
-        :width="photo.width"
-      />
+      <div
+        ref="viewport"
+        class="h-full w-full overflow-hidden touch-none"
+        :class="isZoomed ? 'cursor-grab' : ''"
+        v-bind="zoomHandlers"
+      >
+        <UnLazyImage
+          v-if="photo"
+          ref="swipeTarget"
+          :key="photo.id"
+          :src="`/photo/${photo.album}/${photo.id}/large`"
+          :thumbhash="photo.thumbHash"
+          :style="`aspect-ratio: ${photo.width}/${photo.height}; opacity: ${opacity}; transform: translate(${translation + offsetX}px, ${offsetY}px) scale(${scale});`"
+          class="h-full w-full m-auto object-contain select-none"
+          :class="
+            isGesturing || isSwiping ? '' : 'transition-transform duration-200'
+          "
+          :height="photo.height"
+          :width="photo.width"
+          draggable="false"
+        />
+      </div>
 
       <UButton
         icon="i-lucide-chevron-right"
@@ -143,17 +154,33 @@ const moveRight = () => {
 onKeyStroke("ArrowLeft", () => moveLeft());
 onKeyStroke("ArrowRight", () => moveRight());
 
+const viewport = useTemplateRef<HTMLElement>("viewport");
+const {
+  scale,
+  offsetX,
+  offsetY,
+  isZoomed,
+  isGesturing,
+  reset: resetZoom,
+  handlers: zoomHandlers,
+} = useImageZoom(viewport, {
+  aspectRatio: () => (photo.value ? photo.value.width / photo.value.height : 1),
+});
+
+watch(() => photo.value?.id, resetZoom);
+
 const swipeTarget = useTemplateRef<EventTarget>("swipeTarget");
 const { isSwiping, lengthX } = useSwipe(swipeTarget, {
   passive: false,
   onSwipeEnd(e: TouchEvent, direction) {
+    if (isZoomed.value) return;
     if (direction == "left") moveRight();
     if (direction == "right") moveLeft();
   },
 });
 
 const opacity = computed(() => {
-  if (!isSwiping.value) return 1;
+  if (!isSwiping.value || isZoomed.value) return 1;
   const MAX_DIST = 100;
   const MIN_OPACITY = 0.2;
 
@@ -163,7 +190,7 @@ const opacity = computed(() => {
 });
 
 const translation = computed(() => {
-  if (!isSwiping.value) return 0;
+  if (!isSwiping.value || isZoomed.value) return 0;
   const SCALE = 0.05;
   const MAX_DIST = 10;
 
