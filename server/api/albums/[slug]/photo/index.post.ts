@@ -10,6 +10,13 @@ import { PhotoType } from "~~/server/database/schema/photo";
 
 const MAX_SIZE = 50 * 1024 * 1024;
 
+dayjs.extend(customParseFormat);
+dayjs.extend(timezone);
+dayjs.extend(utc);
+
+const EXIF_DATE_FORMAT = "YYYY:MM:DD HH:mm:ss";
+const EXIF_OFFSET_FORMAT = /^([+-])(\d{2}):(\d{2})$/;
+
 export default defineEventHandler(async (event) => {
   await authorize(event, editAlbums);
 
@@ -51,7 +58,10 @@ export default defineEventHandler(async (event) => {
   const existingPhotos = await timings.time("db-lookup", () =>
     db.query.photo.findMany({
       where: (photo, { and, eq }) =>
-        and(eq(photo.album, album.id), eq(photo.originalDigest, originalDigest)),
+        and(
+          eq(photo.album, album.id),
+          eq(photo.originalDigest, originalDigest),
+        ),
       columns: {
         location: false,
       },
@@ -98,7 +108,9 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const thumbHash = await timings.time("thumbhash", () => createThumbHash(data));
+  const thumbHash = await timings.time("thumbhash", () =>
+    createThumbHash(data),
+  );
   const [dateTime, offsetTime] = getDate(tags.exif);
 
   const result = await timings.time("db-insert", () =>
@@ -179,29 +191,34 @@ const readTag = <T extends object>(
 
 const parseDate = (
   date: string | undefined,
-  tz: string | undefined,
+  offset: string | undefined,
 ): [Date, string] | undefined => {
-  dayjs.extend(customParseFormat);
-  dayjs.extend(timezone);
-  dayjs.extend(utc);
-
   if (!date) {
     return undefined;
   }
 
-  if (!tz) {
-    // If there is no TZ data available we will guess it.
-    tz = dayjs().tz(dayjs.tz.guess()).format("Z");
+  const local = dayjs.utc(date.trim(), EXIF_DATE_FORMAT, true);
+  if (!local.isValid()) {
+    return undefined;
   }
 
-  return [dayjs.tz(date, "YYYY:MM:DD HH:mm:ss", tz).toDate(), tz];
+  const match = EXIF_OFFSET_FORMAT.exec(offset?.trim() ?? "");
+  if (!match) {
+    const guessed = dayjs.tz(date.trim(), EXIF_DATE_FORMAT, dayjs.tz.guess());
+    return [guessed.toDate(), guessed.format("Z")];
+  }
+
+  const [, sign, hours, minutes] = match;
+  const total =
+    (Number(hours) * 60 + Number(minutes)) * (sign === "-" ? -1 : 1);
+
+  return [
+    local.subtract(total, "minute").toDate(),
+    `${total < 0 ? "-" : "+"}${hours}:${minutes}`,
+  ];
 };
 
 const getDate = (exif: exifReader.ExifTags | undefined): [Date, string] => {
-  dayjs.extend(customParseFormat);
-  dayjs.extend(timezone);
-  dayjs.extend(utc);
-
   for (const type of ["Original", "Digitized", ""]) {
     const parsed = parseDate(
       readTag(exif, ("DateTime" + type) as keyof exifReader.ExifTags),
@@ -214,8 +231,8 @@ const getDate = (exif: exifReader.ExifTags | undefined): [Date, string] => {
   }
 
   // Fallback in case the EXIF doesn't contain any dates.
-  const tz = dayjs().tz(dayjs.tz.guess()).format("Z");
-  return [dayjs().tz(tz).toDate(), tz];
+  const now = dayjs();
+  return [now.toDate(), now.format("Z")];
 };
 
 const readLocation = (

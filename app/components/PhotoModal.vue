@@ -107,8 +107,13 @@
 </template>
 
 <script setup lang="ts">
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc.js";
+
 import type { photo as Photo } from "~~/server/database/schema";
 import type { SerializeObject } from "nitropack";
+
+dayjs.extend(utc);
 
 const open = ref(false);
 const photo =
@@ -165,23 +170,21 @@ const translation = computed(() => {
   return Math.max(Math.min(-lengthX.value * SCALE, MAX_DIST), -MAX_DIST);
 });
 
-const dateTitle = computed(() => {
+const captured = computed(() => {
   if (!photo.value) {
-    return "Unknown";
+    return undefined;
   }
 
-  const date = (photo.value.dateTime + photo.value.offsetTime).replace("Z", "");
-  return useDateFormat(date, "MMM D YYYY").value;
+  return dayjs(photo.value.dateTime).utcOffset(photo.value.offsetTime);
 });
 
-const dateDescription = computed(() => {
-  if (!photo.value) {
-    return "";
-  }
+const dateTitle = computed(
+  () => captured.value?.format("D MMM YYYY") ?? "Unknown",
+);
 
-  const date = (photo.value.dateTime + photo.value.offsetTime).replace("Z", "");
-  return useDateFormat(date, "ddd HH:mm:ss zzzz").value;
-});
+const dateDescription = computed(
+  () => captured.value?.format("ddd HH:mm:ss [GMT]Z") ?? "",
+);
 
 const fileDescription = computed(() => {
   if (!photo.value) return "Unknown";
