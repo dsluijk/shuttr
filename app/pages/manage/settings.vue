@@ -74,6 +74,15 @@
             </div>
           </UFormField>
 
+          <UFormField
+            label="Cover"
+            description="Shown at the top of the main page. Uploads are saved immediately."
+          >
+            <div class="mt-1">
+              <InputCover />
+            </div>
+          </UFormField>
+
           <div class="grid gap-4 md:grid-cols-2">
             <UFormField
               label="Primary color"

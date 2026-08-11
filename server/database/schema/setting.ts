@@ -14,6 +14,7 @@ export const setting = pgTable(
     neutralColor: varchar({ length: 16 }).$type<NeutralColor>().notNull(),
     logoLight: char({ length: 24 }),
     logoDark: char({ length: 24 }),
+    cover: char({ length: 24 }),
   },
   (t) => [check("setting_singleton", sql`${t.id}`)],
 );

@@ -1,42 +1,11 @@
 import { createId } from "@paralleldrive/cuid2";
-import sharp from "sharp";
 import z from "zod";
 
 export default defineEventHandler(async (event) => {
   await authorize(event, editSettings);
 
   const { mode } = await getValidatedRouterParams(event, paramSchema.parse);
-
-  const contentLength = Number(getRequestHeader(event, "content-length"));
-  if (contentLength > LOGO_MAX_SIZE) {
-    throw createError({
-      statusCode: 413,
-      statusMessage: "Logo too large",
-    });
-  }
-
-  const data = await readRawBody(event, false);
-  if (!data || data.byteLength === 0) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: "No file uploaded.",
-    });
-  }
-
-  if (data.byteLength > LOGO_MAX_SIZE) {
-    throw createError({
-      statusCode: 413,
-      statusMessage: "Logo too large",
-    });
-  }
-
-  const { format } = await sharp(data).metadata();
-  if (!format || !LOGO_FORMATS.includes(format)) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: "Invalid image format",
-    });
-  }
+  const data = await readImageUpload(event, LOGO_MAX_SIZE);
 
   const logo = await createLogo(data);
   const id = createId();

@@ -5,9 +5,13 @@
       :title="settings.header"
       :description="settings.description"
     >
-      <!-- <div
-        class="rounded-lg w-full lg:h-[450px] h-[350px] bg-radial-[at_60%_60%] from-neutral-300 to-neutral-100 dark:from-neutral-800 dark:to-neutral-700"
-      /> -->
+      <NuxtImg
+        v-if="settings.cover"
+        :src="`/cover/${settings.cover}`"
+        :alt="settings.header"
+        provider="none"
+        class="rounded-lg w-full lg:h-[450px] h-[350px] object-cover"
+      />
 
       <template #links>
         <div class="gap-x-4 gap-y-2 inline-flex flex-wrap justify-center">

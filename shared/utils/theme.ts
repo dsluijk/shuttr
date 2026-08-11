@@ -48,6 +48,7 @@ export const defaultSettings = {
   neutralColor: "neutral",
   logoLight: null,
   logoDark: null,
+  cover: null,
 } satisfies {
   title: string;
   header: string;
@@ -56,4 +57,5 @@ export const defaultSettings = {
   neutralColor: NeutralColor;
   logoLight: string | null;
   logoDark: string | null;
+  cover: string | null;
 };

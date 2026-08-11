@@ -3,13 +3,13 @@ import z from "zod";
 export default defineEventHandler(async (event) => {
   const { id } = await getValidatedRouterParams(event, paramSchema.parse);
 
-  const logo = await useStorage().getItemRaw(logoKey(id));
-  if (!logo) {
-    throw createError({ statusCode: 404, message: "Logo not found." });
+  const cover = await useStorage().getItemRaw(coverKey(id));
+  if (!cover) {
+    throw createError({ statusCode: 404, message: "Cover not found." });
   }
 
   setImageHeaders(event);
-  return toBuffer(logo);
+  return toBuffer(cover);
 });
 
 const paramSchema = z.object({
