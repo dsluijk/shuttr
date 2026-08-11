@@ -261,9 +261,14 @@ const fetchNextAlbums = async () => {
   albums.value.push(...newAlbums);
 };
 
-const { reset: resetAlbums } = useInfiniteScroll(window, fetchNextAlbums, {
-  canLoadMore: () => hasMore.value,
-});
+const { reset: resetAlbums } = useInfiniteScroll(
+  import.meta.client ? window : undefined,
+  fetchNextAlbums,
+  {
+    distance: 200,
+    canLoadMore: () => hasMore.value,
+  },
+);
 
 watch(searchQuery, () => {
   albums.value = [];
