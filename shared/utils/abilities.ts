@@ -58,7 +58,11 @@ export const viewAlbum = defineAbility(
     allowPublic: boolean = false,
     allowUnpublished: boolean = false,
   ) => {
-    if (!album.published && !allowUnpublished && !atLeastRole(UserRole.PUBLISHER, user?.role)) {
+    if (
+      !album.published
+      && !allowUnpublished
+      && !atLeastRole(UserRole.PUBLISHER, user?.role)
+    ) {
       return deny();
     }
 
@@ -87,7 +91,10 @@ export const viewAlbum = defineAbility(
 );
 
 export const viewAuthenticatedAlbums = defineAbility(() => {
-  // This blocks unauthenticated users.
+  return allow();
+});
+
+export const manageFavorites = defineAbility(() => {
   return allow();
 });
 

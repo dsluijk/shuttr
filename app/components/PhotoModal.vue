@@ -112,6 +112,15 @@
         >
           Download
         </UButton>
+        <UButton
+          v-if="loggedIn"
+          icon="i-lucide-heart"
+          :color="isFavorite(photo.id) ? 'error' : 'neutral'"
+          variant="subtle"
+          @click="toggleFavorite"
+        >
+          {{ isFavorite(photo.id) ? "Favorited" : "Favorite" }}
+        </UButton>
       </UFieldGroup>
     </template>
   </UModal>
@@ -130,6 +139,14 @@ const open = ref(false);
 const photo =
   defineModel<SerializeObject<Omit<typeof Photo.$inferSelect, "location">>>();
 const emit = defineEmits<{ moveLeft: []; moveRight: [] }>();
+
+const { loggedIn } = useUserSession();
+const { isFavorite, toggle } = useFavorites();
+
+const toggleFavorite = () => {
+  if (!photo.value) return;
+  toggle(photo.value.id);
+};
 
 watch(open, (isOpen) => {
   if (!isOpen) {
