@@ -43,14 +43,22 @@
 <script setup lang="ts">
 const isIframe = useDetectIframe();
 const settings = useSettings();
+const route = useRoute();
 
 const logo = computed(() => {
   const { logoLight, logoDark } = settings.value;
   if (!logoLight && !logoDark) return null;
 
+  let forcedTheme = null;
+  if (route.query.theme === "dark") {
+    forcedTheme = logoDark;
+  } else if (route.query.theme === "light") {
+    forcedTheme = logoLight;
+  }
+
   return {
-    light: `/logo/${logoLight ?? logoDark}`,
-    dark: `/logo/${logoDark ?? logoLight}`,
+    light: `/logo/${forcedTheme ?? logoLight ?? logoDark}`,
+    dark: `/logo/${forcedTheme ?? logoDark ?? logoLight}`,
   };
 });
 </script>
