@@ -142,8 +142,8 @@ const swipeTarget = useTemplateRef<EventTarget>("swipeTarget");
 const { isSwiping, lengthX } = useSwipe(swipeTarget, {
   passive: false,
   onSwipeEnd(e: TouchEvent, direction) {
-    if (direction == "left") moveLeft();
-    if (direction == "right") moveRight();
+    if (direction == "left") moveRight();
+    if (direction == "right") moveLeft();
   },
 });
 
