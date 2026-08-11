@@ -1,3 +1,11 @@
+import {
+  computed,
+  ref,
+  toValue,
+  useEventListener,
+  type MaybeRefOrGetter,
+} from "#imports";
+
 type ImageZoomOptions = {
   aspectRatio: MaybeRefOrGetter<number>;
   maxScale?: number;
