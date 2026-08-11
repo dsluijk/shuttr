@@ -20,6 +20,10 @@ export default defineNuxtConfig({
     fonts: false,
   },
 
+  image: {
+    none: {},
+  },
+
   compatibilityDate: "2024-11-01",
 
   runtimeConfig: {
@@ -57,26 +61,6 @@ export default defineNuxtConfig({
         endpoint: "",
         region: "",
       },
-    },
-    public: {
-      title: "Shuttr",
-      header: "Shuttr Photo Gallery",
-      description:
-        "Shuttr is a simple to use self-hosted photo gallery for amateurs.",
-      links: [
-        {
-          icon: "i-lucide-link",
-          to: "https://dany.dev",
-        },
-        {
-          icon: "i-simple-icons-github",
-          to: "https://github.com/dsluijk",
-        },
-        {
-          icon: "i-simple-icons-linkedin",
-          to: "https://www.linkedin.com/in/danysluijk/",
-        },
-      ],
     },
   },
 

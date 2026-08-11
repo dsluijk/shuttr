@@ -1,18 +1,13 @@
-import { icons } from "@iconify-json/lucide";
+import * as z from "zod";
 
-const capitalizeWords = (input: string): string => {
-  return input
-    .split(" ")
-    .map((word) => {
-      return word.charAt(0).toUpperCase() + word.slice(1);
-    })
-    .join(" ");
-};
+export default defineEventHandler(async (event) => {
+  const { collections } = await getValidatedQuery(event, querySchema.parse);
+  return listIcons(collections);
+});
 
-export default defineEventHandler(async () => {
-  const iconNames = Object.keys(icons.icons);
-  return iconNames.map((icon) => ({
-    name: capitalizeWords(icon.replaceAll("-", " ")),
-    icon: `i-lucide-${icon}`,
-  }));
+const querySchema = z.object({
+  collections: z
+    .union([z.enum(iconCollections), z.array(z.enum(iconCollections))])
+    .default("lucide")
+    .transform((value) => (Array.isArray(value) ? value : [value])),
 });

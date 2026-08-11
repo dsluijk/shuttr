@@ -26,6 +26,14 @@ export const listUsers = defineAbility((user: User) => {
   return deny();
 });
 
+export const editSettings = defineAbility((user: User) => {
+  if (atLeastRole(UserRole.ADMIN, user.role)) {
+    return allow();
+  }
+
+  return deny();
+});
+
 export const editAlbums = defineAbility((user: User) => {
   if (atLeastRole(UserRole.PUBLISHER, user.role)) {
     return allow();

@@ -1,9 +1,5 @@
 export default defineAppConfig({
   ui: {
-    colors: {
-      primary: "blue",
-      neutral: "neutral",
-    },
     pageBody: {
       base: "pb-8",
     },

@@ -1,0 +1,1 @@
+ALTER TABLE "setting" ADD COLUMN "cover" char(24);
