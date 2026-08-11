@@ -2,8 +2,8 @@
   <UPage>
     <AnimatedHero
       v-if="!isIframe"
-      :title="config.header"
-      :description="config.description"
+      :title="settings.header"
+      :description="settings.description"
     >
       <!-- <div
         class="rounded-lg w-full lg:h-[450px] h-[350px] bg-radial-[at_60%_60%] from-neutral-300 to-neutral-100 dark:from-neutral-800 dark:to-neutral-700"
@@ -12,8 +12,8 @@
       <template #links>
         <div class="gap-x-4 inline-flex">
           <Motion
-            v-for="(link, index) of config.links"
-            :key="index"
+            v-for="(link, index) of settings.links"
+            :key="link.id"
             :initial="{
               scale: 1.1,
               opacity: 0,
@@ -30,13 +30,13 @@
             }"
           >
             <UButton
-              v-bind="{
-                size: 'md',
-                color: 'neutral',
-                variant: 'ghost',
-                target: '_blank',
-                ...link,
-              }"
+              size="md"
+              color="neutral"
+              variant="ghost"
+              target="_blank"
+              :icon="link.icon"
+              :to="link.to"
+              :label="link.label ?? undefined"
             />
           </Motion>
         </div>
@@ -223,14 +223,14 @@
 
 <script setup lang="ts">
 const isIframe = useDetectIframe();
-const config = useRuntimeConfig().public;
+const settings = useSettings();
 
 useSeoMeta({
   titleTemplate: "",
-  title: config.header,
-  ogTitle: config.header,
-  description: config.description,
-  ogDescription: config.description,
+  title: () => settings.value.header,
+  ogTitle: () => settings.value.header,
+  description: () => settings.value.description,
+  ogDescription: () => settings.value.description,
 });
 
 const { data: labels, pending: labelsLoading } = await useFetch("/api/labels");

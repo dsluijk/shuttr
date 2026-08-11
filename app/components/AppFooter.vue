@@ -24,15 +24,15 @@
 
     <template #right>
       <UButton
-        v-for="(link, index) of config.links"
-        :key="index"
-        v-bind="{
-          size: 'xs',
-          color: 'neutral',
-          variant: 'ghost',
-          target: '_blank',
-          ...link,
-        }"
+        v-for="link of settings.links"
+        :key="link.id"
+        size="xs"
+        color="neutral"
+        variant="ghost"
+        target="_blank"
+        :icon="link.icon"
+        :to="link.to"
+        :label="link.label ?? undefined"
       />
       <ColorModeButton />
     </template>
@@ -40,5 +40,5 @@
 </template>
 
 <script setup lang="ts">
-const config = useRuntimeConfig().public;
+const settings = useSettings();
 </script>

@@ -11,9 +11,9 @@
 </template>
 
 <script setup lang="ts">
-const config = useRuntimeConfig().public;
+const settings = useSettings();
 
-useSeoMeta({
-  titleTemplate: `%s - ${config.title}`,
-});
+useHead(() => ({
+  titleTemplate: `%s - ${settings.value.title}`,
+}));
 </script>

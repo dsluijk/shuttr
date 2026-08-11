@@ -1,6 +1,6 @@
 <template>
   <UHeader
-    :title="config.title"
+    :title="settings.title"
     :toggle="false"
   >
     <template #right>
@@ -28,5 +28,5 @@
 
 <script setup lang="ts">
 const isIframe = useDetectIframe();
-const config = useRuntimeConfig().public;
+const settings = useSettings();
 </script>

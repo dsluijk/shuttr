@@ -4,3 +4,5 @@ export { album, albumVisibilityColumn, albumRelations } from "./album";
 export { photo, photoTypeColumn, photoRelations } from "./photo";
 export { label, labelStyleColumn, labelRelations } from "./label";
 export { albumLabels, albumLabelsRelations } from "./albumLabels";
+export { setting } from "./setting";
+export { link } from "./link";

@@ -128,45 +128,6 @@
             description = "The group shuttr should run as.";
           };
 
-          title = mkOption {
-            type = types.str;
-            default = "Shuttr";
-            description = "The title used on pages.";
-          };
-          header = mkOption {
-            type = types.str;
-            default = "Shuttr Photo Gallery";
-            description = "The header used on pages.";
-          };
-          description = mkOption {
-            type = types.str;
-            default = "Shuttr Photo Gallery";
-            description = "The description shown on the main page.";
-          };
-          links = mkOption {
-            type = types.listOf (types.submodule {
-              options = {
-                icon = mkOption {
-                  type = types.str;
-                  default = "i-lucide-link";
-                  description = "The icon used with the link.";
-                };
-                to = mkOption {
-                  type = types.str;
-                  default = "https://github.com/dsluijk/shuttr";
-                  description = "The destination of the link.";
-                };
-              };
-            });
-            default = [
-              {
-                icon = "i-simple-icons-github";
-                to = "https://github.com/dsluijk/shuttr";
-              }
-            ];
-            description = "The links shown on the main page and footer.";
-          };
-
           database = {
             enable =
               mkEnableOption "the postgresql database for use with shuttr. See {option}`services.postgresql`"
@@ -323,10 +284,6 @@
                 HOST = cfg.host;
                 PORT = toString cfg.port;
                 NUXT_STORAGE_THUMB_CACHE_MAX = toString cfg.storage.cacheSize;
-                NUXT_PUBLIC_TITLE = cfg.title;
-                NUXT_PUBLIC_HEADER = cfg.header;
-                NUXT_PUBLIC_DESCRIPTION = cfg.description;
-                NUXT_PUBLIC_LINKS = builtins.toJSON cfg.links;
               }
               postgresEnv
               authAuthentikEnv

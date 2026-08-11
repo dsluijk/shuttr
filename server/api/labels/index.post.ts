@@ -1,5 +1,4 @@
 import * as z from "zod";
-import { icons as lucideIcons } from "@iconify-json/lucide";
 
 import { LabelStyle } from "~~/server/database/schema/label";
 
@@ -29,15 +28,12 @@ export default defineEventHandler(async (event) => {
   return result[0];
 });
 
-const iconOptions = Object.keys(lucideIcons.icons).map(
-  (icon) => `i-lucide-${icon}`,
-);
 const bodySchema = z.object({
   title: z
     .string("A title is required")
     .min(2, "Must be at least 2 characters")
     .max(24, "Cannot be longer than 24 characters"),
   style: z.enum(LabelStyle),
-  icon: z.literal(iconOptions).optional(),
+  icon: iconValidator(["lucide"]).optional(),
   color: readableColorValidator().optional(),
 });

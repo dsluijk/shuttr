@@ -1,6 +1,11 @@
 @import "tailwindcss";
 @import "@nuxt/ui";
 
+/* Swatches for the theme color picker, which builds its classes dynamically. */
+@source inline(
+  "bg-{slate,gray,zinc,neutral,stone,mauve,olive,mist,taupe,red,orange,amber,yellow,lime,green,emerald,teal,cyan,sky,blue,indigo,violet,purple,fuchsia,pink,rose}-500"
+);
+
 @theme static {
   --font-sans: "Public Sans", sans-serif;
   --font-serif: "Instrument Serif", serif;

@@ -20,11 +20,17 @@
 
 <script setup lang="ts">
 import type { NavigationMenuItem } from "@nuxt/ui";
-import { listUsers, editAlbums, editLabels } from "~~/shared/utils/abilities";
+import {
+  listUsers,
+  editAlbums,
+  editLabels,
+  editSettings,
+} from "~~/shared/utils/abilities";
 
 const canListUsers = await allows(listUsers);
 const canEditAlbums = await allows(editAlbums);
 const canEditLabels = await allows(editLabels);
+const canEditSettings = await allows(editSettings);
 
 const items = computed<NavigationMenuItem[]>(() =>
   [
@@ -50,6 +56,7 @@ const items = computed<NavigationMenuItem[]>(() =>
       label: "Settings",
       icon: "i-lucide-settings",
       to: "/manage/settings",
+      show: canEditSettings,
     },
   ].filter((row) => row.show === undefined || row.show),
 );
