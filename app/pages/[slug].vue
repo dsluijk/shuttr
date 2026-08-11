@@ -189,7 +189,7 @@ const scrollArea = useTemplateRef("scrollArea");
 const { width } = useElementSize(() => scrollArea.value?.$el);
 
 const lanes = computed(() =>
-  Math.max(1, Math.min(4, Math.floor(width.value / 300))),
+  Math.max(1, Math.min(3, Math.floor(width.value / 300))),
 );
 
 const openPhoto = ref<
