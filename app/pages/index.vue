@@ -10,7 +10,7 @@
       /> -->
 
       <template #links>
-        <div class="gap-x-4 inline-flex">
+        <div class="gap-x-4 gap-y-2 inline-flex flex-wrap justify-center">
           <Motion
             v-for="(link, index) of settings.links"
             :key="link.id"
