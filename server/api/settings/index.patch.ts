@@ -4,25 +4,8 @@ export default defineEventHandler(async (event) => {
   await authorize(event, editSettings);
 
   const body = await readValidatedBody(event, bodySchema.parse);
-  const { links: _links, id: _id, ...current } = await getSettings();
-  const values = { ...current, ...body };
 
-  const db = useDrizzle();
-  const result = await db
-    .insert(tables.setting)
-    .values({ id: true, ...values })
-    .onConflictDoUpdate({ target: tables.setting.id, set: values })
-    .returning();
-
-  if (result.length !== 1 || !result[0]) {
-    throw createError({
-      statusCode: 500,
-      message: "Failed to update the settings",
-    });
-  }
-
-  invalidateSettings();
-  return await getSettings();
+  return await updateSettings(body);
 });
 
 const bodySchema = z.object({

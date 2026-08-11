@@ -113,6 +113,13 @@
       "when": 1786452161980,
       "tag": "0015_settings",
       "breakpoints": true
+    },
+    {
+      "idx": 16,
+      "version": "7",
+      "when": 1786459466083,
+      "tag": "0016_logo",
+      "breakpoints": true
     }
   ]
 }

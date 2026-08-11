@@ -46,10 +46,14 @@ export const defaultSettings = {
     "Shuttr is a simple to use self-hosted photo gallery for amateurs.",
   primaryColor: "blue",
   neutralColor: "neutral",
+  logoLight: null,
+  logoDark: null,
 } satisfies {
   title: string;
   header: string;
   description: string;
   primaryColor: PrimaryColor;
   neutralColor: NeutralColor;
+  logoLight: string | null;
+  logoDark: string | null;
 };

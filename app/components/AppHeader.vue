@@ -2,7 +2,21 @@
   <UHeader
     :title="settings.title"
     :toggle="false"
+    :ui="{ left: 'min-w-0', title: 'min-w-0 shrink' }"
   >
+    <template
+      v-if="logo"
+      #title
+    >
+      <UColorModeImage
+        :light="logo.light"
+        :dark="logo.dark"
+        :alt="settings.title"
+        provider="none"
+        class="h-8 w-auto max-w-64 min-w-0 object-cover object-left"
+      />
+    </template>
+
     <template #right>
       <AuthState
         v-if="!isIframe"
@@ -29,4 +43,14 @@
 <script setup lang="ts">
 const isIframe = useDetectIframe();
 const settings = useSettings();
+
+const logo = computed(() => {
+  const { logoLight, logoDark } = settings.value;
+  if (!logoLight && !logoDark) return null;
+
+  return {
+    light: `/logo/${logoLight ?? logoDark}`,
+    dark: `/logo/${logoDark ?? logoLight}`,
+  };
+});
 </script>

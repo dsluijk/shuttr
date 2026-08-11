@@ -1,4 +1,6 @@
-import { useDrizzle } from "./drizzle";
+import { createError } from "h3";
+
+import { tables, useDrizzle } from "./drizzle";
 import { defaultSettings } from "~~/shared/utils/theme";
 
 import type { link, setting } from "../database/schema";
@@ -43,4 +45,28 @@ export const getSettings = async (): Promise<Settings> => {
 
 export const invalidateSettings = () => {
   cache = null;
+};
+
+export const updateSettings = async (
+  values: Partial<Omit<Settings, "id" | "links">>,
+): Promise<Settings> => {
+  const { links: _links, id: _id, ...current } = await getSettings();
+  const merged = { ...current, ...values };
+
+  const db = useDrizzle();
+  const result = await db
+    .insert(tables.setting)
+    .values({ id: true, ...merged })
+    .onConflictDoUpdate({ target: tables.setting.id, set: merged })
+    .returning();
+
+  if (result.length !== 1 || !result[0]) {
+    throw createError({
+      statusCode: 500,
+      message: "Failed to update the settings",
+    });
+  }
+
+  invalidateSettings();
+  return await getSettings();
 };

@@ -64,6 +64,16 @@
             />
           </UFormField>
 
+          <UFormField
+            label="Logo"
+            description="Replaces the title in the header. Uploads are saved immediately."
+          >
+            <div class="mt-1 grid gap-4 md:grid-cols-2">
+              <InputLogo mode="light" />
+              <InputLogo mode="dark" />
+            </div>
+          </UFormField>
+
           <div class="grid gap-4 md:grid-cols-2">
             <UFormField
               label="Primary color"

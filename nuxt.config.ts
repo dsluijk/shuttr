@@ -20,6 +20,10 @@ export default defineNuxtConfig({
     fonts: false,
   },
 
+  image: {
+    none: {},
+  },
+
   compatibilityDate: "2024-11-01",
 
   runtimeConfig: {
