@@ -127,6 +127,13 @@
       "when": 1786462275425,
       "tag": "0017_cover",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1786470168916,
+      "tag": "0018_favorite",
+      "breakpoints": true
     }
   ]
 }

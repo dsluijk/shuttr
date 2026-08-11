@@ -114,57 +114,15 @@
     </AnimatedHero>
 
     <UPageBody class="mt-0">
-      <UScrollArea
-        v-if="album.photos.length > 0"
-        ref="scrollArea"
-        v-slot="{ item: photo }"
-        :items="album.photos"
-        orientation="vertical"
-        :virtualize="{
-          lanes,
-          gap: 16,
-          estimateSize: (index: number) => {
-            if (!album) return 0;
-            const photo = album.photos[index];
-            if (!photo) return 0;
-
-            const itemWidth = width > 0 ? width : photo.width;
-            const laneWidth = (itemWidth - 16 * (lanes - 1)) / lanes;
-            return (photo.height / photo.width) * laneWidth;
-          },
-        }"
-      >
-        <UnLazyImage
-          :src="`/photo/${album.id}/${photo.id}/thumb`"
-          :thumbhash="photo.thumbHash"
-          :style="`aspect-ratio: ${photo.width / photo.height};`"
-          class="h-full w-full object-cover rounded-lg"
-          @click="() => (openPhoto = photo)"
-        />
-      </UScrollArea>
-
-      <UEmpty
-        v-else
-        variant="naked"
-        size="xl"
-        icon="i-lucide-file-question-mark"
-        title="No photos found"
-        description="It looks like there aren't any photos in this album."
-      />
-
-      <PhotoModal
-        v-model="openPhoto"
-        @move-left="() => changeModal(true)"
-        @move-right="() => changeModal()"
+      <PhotoGrid
+        :photos="album.photos"
+        emptyDescription="It looks like there aren't any photos in this album."
       />
     </UPageBody>
   </UPage>
 </template>
 
 <script setup lang="ts">
-import type { photo as Photo } from "~~/server/database/schema";
-import type { SerializeObject } from "nitropack";
-
 const canEditAlbums = await allows(editAlbums);
 
 const route = useRoute();
@@ -184,32 +142,6 @@ useSeoMeta({
     : undefined,
   twitterCard: album.value.cover ? "summary_large_image" : undefined,
 });
-
-const scrollArea = useTemplateRef("scrollArea");
-const { width } = useElementSize(() => scrollArea.value?.$el);
-
-const lanes = computed(() =>
-  Math.max(1, Math.min(3, Math.floor(width.value / 300))),
-);
-
-const openPhoto = ref<
-  SerializeObject<Omit<typeof Photo.$inferSelect, "location">> | undefined
->(undefined);
-
-const changeModal = (backwards: boolean = false) => {
-  if (openPhoto.value === undefined || album.value === undefined) return;
-
-  const offset = backwards ? -1 : 1;
-  const photoIndex = album.value.photos.findIndex(
-    (photo) => photo.id === openPhoto.value?.id,
-  );
-
-  const nextIndex =
-    (((photoIndex + offset) % album.value.photos.length)
-      + album.value.photos.length)
-    % album.value.photos.length;
-  openPhoto.value = album.value.photos[nextIndex];
-};
 
 const { share, isSupported: shareSupported } = useShare();
 const shareAlbum = () => {
