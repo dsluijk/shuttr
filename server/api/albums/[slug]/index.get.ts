@@ -29,6 +29,11 @@ export default defineEventHandler(async (event) => {
     });
   }
 
+  album.albumLabels.sort(
+    (a, b) =>
+      a.label.ordering - b.label.ordering
+      || a.label.title.localeCompare(b.label.title),
+  );
   return album;
 });
 

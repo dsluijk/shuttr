@@ -75,12 +75,19 @@ export default defineEventHandler(async (event) => {
 
     return {
       ...createdAlbum,
-      albumLabels: albumLabelResult.map((albumLabel) => ({
-        ...albumLabel,
-        label: existingLabels.find(
-          (existing) => albumLabel.labelId === existing.id,
+      albumLabels: albumLabelResult
+        .map((albumLabel) => ({
+          ...albumLabel,
+          label: existingLabels.find(
+            (existing) => albumLabel.labelId === existing.id,
+          ),
+        }))
+        .sort((a, b) =>
+          a.label && b.label
+            ? a.label.ordering - b.label.ordering
+            || a.label.title.localeCompare(b.label.title)
+            : 0,
         ),
-      })),
     };
   });
 });

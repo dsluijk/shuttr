@@ -63,35 +63,13 @@
           label="Labels"
           name="labels"
         >
-          <USelectMenu
+          <InputLabels
             v-model="state.labels"
-            :items="labels"
-            :loading="labelsLoading"
-            valueKey="id"
-            labelKey="title"
-            createItem="always"
             placeholder="Enter labels.."
-            variant="soft"
             size="lg"
             class="w-full"
-            multiple
-            @create="(labelTitle) => createLabel(labelTitle)"
-          >
-            <template #default="{ modelValue }">
-              <Label
-                v-for="(label, index) of mapLabelIds(modelValue ?? [])"
-                :key="index"
-                size="sm"
-                :model="label"
-              >
-                {{ label?.title ?? "Unknown" }}
-              </Label>
-            </template>
-
-            <template #item="{ item: label }">
-              <Label :model="label">{{ label.title }}</Label>
-            </template>
-          </USelectMenu>
+            creatable
+          />
         </UFormField>
 
         <UFormField
@@ -139,10 +117,6 @@ import { CalendarDate } from "@internationalized/date";
 
 const toast = useToast();
 
-const { data: labels, pending: labelsLoading } = await useFetch("/api/labels", {
-  deep: true,
-});
-
 const now = new Date();
 const maxDate = new CalendarDate(
   now.getFullYear(),
@@ -185,11 +159,6 @@ const state = shallowReactive<Partial<SchemaIn>>({
   sharingAllowed: true,
 });
 
-const mapLabelIds = (labelIds: string[]) =>
-  labelIds.map((labelId) =>
-    labels.value?.find((label) => label.id === labelId),
-  );
-
 const createAlbum = async (event: FormSubmitEvent<SchemaOut>) => {
   const createdAlbum = await useRequestFetch()("/api/albums", {
     method: "POST",
@@ -204,19 +173,5 @@ const createAlbum = async (event: FormSubmitEvent<SchemaOut>) => {
   });
 
   await navigateTo(`/manage/albums/${createdAlbum?.slug}`);
-};
-
-const createLabel = async (labelTitle: string) => {
-  const createdLabel = await useRequestFetch()("/api/labels", {
-    method: "POST",
-    body: {
-      title: labelTitle,
-      style: "solid",
-    },
-  });
-
-  if (!createdLabel) return;
-  labels.value?.unshift(createdLabel);
-  state.labels?.push(createdLabel.id);
 };
 </script>

@@ -1,5 +1,5 @@
 import z from "zod";
-import { and, desc, eq, getTableColumns, or, sql } from "drizzle-orm";
+import { and, desc, eq, getTableColumns, inArray, or, sql } from "drizzle-orm";
 import { AlbumVisibility } from "~~/server/database/schema/album";
 
 export default defineEventHandler(async (event) => {
@@ -29,13 +29,15 @@ export default defineEventHandler(async (event) => {
       albumLabels: sql<(typeof tables.label.$inferSelect)[]>`
         coalesce(
           json_agg(
-            distinct jsonb_build_object(
+            jsonb_build_object(
               'id', ${tables.label.id},
               'title', ${tables.label.title},
               'style', ${tables.label.style},
               'color', ${tables.label.color},
-              'icon', ${tables.label.icon}
+              'icon', ${tables.label.icon},
+              'ordering', ${tables.label.ordering}
             )
+            order by ${tables.label.ordering}, ${tables.label.title}
           ) filter (where ${tables.label.id} is not null),
           '[]'
         )
@@ -53,7 +55,6 @@ export default defineEventHandler(async (event) => {
         search && search.length > 0
           ? sql`${tables.album.search} @@ to_tsquery('english', ${search} || ':*')`
           : sql`true`,
-        and(...labels.map((label) => eq(tables.label.id, label))),
         !unpublished ? eq(tables.album.published, true) : undefined,
         or(
           accessLevels.public
@@ -69,6 +70,13 @@ export default defineEventHandler(async (event) => {
       ),
     )
     .groupBy(tables.album.id, tables.photo.id)
+    .having(
+      labels.length > 0
+        ? sql`count(distinct ${tables.label.id}) filter (
+            where ${inArray(tables.label.id, labels)}
+          ) = ${labels.length}`
+        : undefined,
+    )
     .orderBy(desc(tables.album.startDate), desc(tables.album.createdAt))
     .limit(limit)
     .offset(offset);

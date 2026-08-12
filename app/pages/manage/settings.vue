@@ -156,7 +156,7 @@
             <template #drag-cell="{ row }">
               <UButton
                 as="span"
-                :data-link-id="row.original.id"
+                :data-drag-id="row.original.id"
                 icon="i-lucide-grip-vertical"
                 color="neutral"
                 variant="ghost"
@@ -168,8 +168,6 @@
                 draggable="true"
                 @dragstart="dragStart($event, row.original.id)"
                 @dragend="dragEnd"
-                @keydown.up.prevent="shiftLink(row.original.id, -1)"
-                @keydown.down.prevent="shiftLink(row.original.id, 1)"
               />
             </template>
 
@@ -254,7 +252,7 @@
 
 <script setup lang="ts">
 import * as z from "zod";
-import type { FormSubmitEvent, TableColumn, TableRow } from "@nuxt/ui";
+import type { FormSubmitEvent, TableColumn } from "@nuxt/ui";
 import type { SettingsLink } from "~~/server/utils/settings";
 import { editSettings } from "~~/shared/utils/abilities";
 import {
@@ -385,89 +383,21 @@ const saveLink = (savedLink: SettingsLink) => {
   settings.value.links = sortLinks([...others, savedLink]);
 };
 
-const draggedId = ref<string | null>(null);
-const dropTargetId = ref<string | null>(null);
+const links = computed({
+  get: () => settings.value.links,
+  set: (value) => {
+    settings.value.links = value;
+  },
+});
 
-const rowClass = (row: TableRow<SettingsLink>) => {
-  if (row.original.id === draggedId.value) return "opacity-50";
-  if (row.original.id === dropTargetId.value) return "bg-elevated";
-
-  return "";
-};
-
-const linkIdFromEvent = (event: DragEvent) => {
-  const row = (event.target as Element | null)?.closest?.("tr");
-  const handle = row?.querySelector<HTMLElement>("[data-link-id]");
-
-  return handle?.dataset.linkId ?? null;
-};
-
-const dragStart = (event: DragEvent, id: string) => {
-  draggedId.value = id;
-  if (!event.dataTransfer) return;
-
-  event.dataTransfer.effectAllowed = "move";
-  event.dataTransfer.setData("text/plain", id);
-
-  const row = (event.target as Element).closest("tr");
-  if (row) event.dataTransfer.setDragImage(row, 0, 0);
-};
-
-const dragEnd = () => {
-  draggedId.value = null;
-  dropTargetId.value = null;
-};
-
-const dragOver = (event: DragEvent) => {
-  if (!draggedId.value) return;
-
-  event.preventDefault();
-  dropTargetId.value = linkIdFromEvent(event);
-};
-
-const drop = (event: DragEvent) => {
-  event.preventDefault();
-
-  const id = draggedId.value;
-  const targetId = linkIdFromEvent(event);
-  dragEnd();
-
-  if (!id || !targetId) return;
-  return moveLink(id, targetId);
-};
-
-const moveLink = async (id: string, targetId: string) => {
-  const links = [...settings.value.links];
-  const from = links.findIndex((link) => link.id === id);
-  const to = links.findIndex((link) => link.id === targetId);
-  if (from === -1 || to === -1 || from === to) return;
-
-  const [moved] = links.splice(from, 1);
-  if (!moved) return;
-  links.splice(to, 0, moved);
-
-  const previous = settings.value.links;
-  settings.value.links = links;
-
-  try {
-    settings.value.links = await useRequestFetch()("/api/links", {
+const { rowClass, dragStart, dragEnd, dragOver, drop } = useDragOrder(
+  links,
+  (ids) =>
+    useRequestFetch()("/api/links", {
       method: "PATCH",
-      body: { ids: links.map((link) => link.id) },
-    });
-  } catch (error) {
-    settings.value.links = previous;
-    throw error;
-  }
-};
-
-const shiftLink = (id: string, offset: number) => {
-  const links = settings.value.links;
-  const from = links.findIndex((link) => link.id === id);
-  const target = from === -1 ? undefined : links[from + offset];
-
-  if (!target) return;
-  return moveLink(id, target.id);
-};
+      body: { ids },
+    }),
+);
 
 const deleteLink = async (link: SettingsLink, close: () => void) => {
   await useRequestFetch()(`/api/links/${link.id}`, {

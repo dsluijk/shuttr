@@ -118,12 +118,18 @@ export default defineEventHandler(async (event) => {
     return {
       ...updatedAlbum,
       cover: album.cover,
-      albumLabels: albumLabels.map((albumLabel) => ({
-        ...albumLabel,
-        label: selectedLabels.find(
-          (selected) => albumLabel.labelId === selected.id,
-        ) as typeof tables.label.$inferSelect,
-      })),
+      albumLabels: albumLabels
+        .map((albumLabel) => ({
+          ...albumLabel,
+          label: selectedLabels.find(
+            (selected) => albumLabel.labelId === selected.id,
+          ) as typeof tables.label.$inferSelect,
+        }))
+        .sort(
+          (a, b) =>
+            a.label.ordering - b.label.ordering
+            || a.label.title.localeCompare(b.label.title),
+        ),
     };
   });
 });

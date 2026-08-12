@@ -18,72 +18,97 @@
           container: 'p-0 sm:p-0',
         }"
       >
-        <UTable
-          v-model:columnVisibility="columnVisibility"
-          :data="labels"
-          :columns="columns"
-          :loading="status === 'pending'"
+        <div
+          class="min-w-0"
+          @dragover="dragOver"
+          @drop="drop"
         >
-          <template #title-cell="{ row }">
-            <Label
-              size="lg"
-              :model="row.original"
-            >
-              {{ row.getValue("title") }}
-            </Label>
-          </template>
-
-          <template #actions-cell="{ row }">
-            <UFieldGroup>
+          <UTable
+            v-model:columnVisibility="columnVisibility"
+            :data="orderedLabels"
+            :columns="columns"
+            :loading="status === 'pending'"
+            :meta="{ class: { tr: rowClass } }"
+          >
+            <template #drag-cell="{ row }">
               <UButton
-                icon="i-lucide-pencil"
+                as="span"
+                :data-drag-id="row.original.id"
+                icon="i-lucide-grip-vertical"
                 color="neutral"
-                variant="soft"
+                variant="ghost"
                 size="sm"
-                disabled
-              >
-                Edit
-              </UButton>
+                role="button"
+                tabindex="0"
+                aria-label="Reorder label"
+                class="cursor-grab active:cursor-grabbing"
+                draggable="true"
+                @dragstart="dragStart($event, row.original.id)"
+                @dragend="dragEnd"
+              />
+            </template>
 
-              <UModal
-                title="Are you sure?"
-                :ui="{ footer: 'justify-end' }"
+            <template #title-cell="{ row }">
+              <Label
+                size="lg"
+                :model="row.original"
               >
+                {{ row.getValue("title") }}
+              </Label>
+            </template>
+
+            <template #actions-cell="{ row }">
+              <UFieldGroup>
                 <UButton
-                  icon="i-lucide-trash"
-                  color="error"
+                  icon="i-lucide-pencil"
+                  color="neutral"
                   variant="soft"
                   size="sm"
+                  disabled
                 >
-                  Delete
+                  Edit
                 </UButton>
 
-                <template #body>
-                  Do you really want to delete the label "{{
-                    row.getValue("title")
-                  }}"? This action cannot be undone.
-                </template>
+                <UModal
+                  title="Are you sure?"
+                  :ui="{ footer: 'justify-end' }"
+                >
+                  <UButton
+                    icon="i-lucide-trash"
+                    color="error"
+                    variant="soft"
+                    size="sm"
+                  >
+                    Delete
+                  </UButton>
 
-                <template #footer="{ close }">
-                  <UFieldGroup>
-                    <UButton
-                      label="Delete"
-                      color="error"
-                      variant="soft"
-                      @click="() => deleteLabel(row, close)"
-                    />
-                    <UButton
-                      label="Cancel"
-                      color="neutral"
-                      variant="soft"
-                      @click="close"
-                    />
-                  </UFieldGroup>
-                </template>
-              </UModal>
-            </UFieldGroup>
-          </template>
-        </UTable>
+                  <template #body>
+                    Do you really want to delete the label "{{
+                      row.getValue("title")
+                    }}"? This action cannot be undone.
+                  </template>
+
+                  <template #footer="{ close }">
+                    <UFieldGroup>
+                      <UButton
+                        label="Delete"
+                        color="error"
+                        variant="soft"
+                        @click="() => deleteLabel(row, close)"
+                      />
+                      <UButton
+                        label="Cancel"
+                        color="neutral"
+                        variant="soft"
+                        @click="close"
+                      />
+                    </UFieldGroup>
+                  </template>
+                </UModal>
+              </UFieldGroup>
+            </template>
+          </UTable>
+        </div>
       </UPageCard>
     </UPageBody>
   </div>
@@ -107,6 +132,22 @@ const toast = useToast();
 const { data: labels, status } = await useFetch("/api/labels", { deep: true });
 type LabelData = NonNullable<typeof labels.value>[number];
 
+const orderedLabels = computed({
+  get: () => labels.value ?? [],
+  set: (value) => {
+    labels.value = value;
+  },
+});
+
+const { rowClass, dragStart, dragEnd, dragOver, drop } = useDragOrder(
+  orderedLabels,
+  (ids) =>
+    useRequestFetch()("/api/labels", {
+      method: "PATCH",
+      body: { ids },
+    }),
+);
+
 const columnVisibility = ref({
   id: false,
   style: false,
@@ -114,12 +155,22 @@ const columnVisibility = ref({
 
 const columns: TableColumn<LabelData>[] = [
   {
+    id: "drag",
+    header: "",
+  },
+  {
     accessorKey: "id",
     header: "ID",
   },
   {
     accessorKey: "title",
     header: "Title",
+    meta: {
+      class: {
+        th: "w-full",
+        td: "w-full",
+      },
+    },
   },
   {
     accessorKey: "style",
@@ -134,7 +185,7 @@ const columns: TableColumn<LabelData>[] = [
 const newLabel = (createdLabel: typeof label.$inferSelect) => {
   if (!labels.value) return;
 
-  labels.value.unshift(createdLabel);
+  labels.value.push(createdLabel);
 };
 
 const deleteLabel = async (row: TableRow<LabelData>, close: () => void) => {
