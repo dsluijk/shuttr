@@ -147,10 +147,23 @@
 
             <template #badge>
               <div class="flex w-full min-h-6">
-                <div
-                  v-if="album.albumLabels.length > 0"
-                  class="flex gap-2 overflow-hidden flex-wrap"
-                >
+                <div class="flex gap-2 overflow-hidden flex-wrap">
+                  <UBadge
+                    v-if="album.visibility === 'authenticated'"
+                    icon="i-lucide-users"
+                    color="warning"
+                    variant="subtle"
+                    size="sm"
+                    class="px-2"
+                  />
+                  <UBadge
+                    v-if="album.visibility === 'private'"
+                    icon="i-lucide-lock"
+                    color="error"
+                    variant="subtle"
+                    size="sm"
+                    class="px-2"
+                  />
                   <Label
                     v-for="albumLabel of album.albumLabels"
                     :key="albumLabel.id"
