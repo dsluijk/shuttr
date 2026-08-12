@@ -10,6 +10,9 @@
       <UPageCard
         variant="subtle"
         class="overflow-x-auto"
+        :ui="{
+          container: 'p-0 sm:p-0',
+        }"
       >
         <UTable
           :data="data"

@@ -99,10 +99,10 @@ const modalOpen = ref(false);
 const toast = useToast();
 
 const styleOptions = ref([
-  { label: "Solid", value: LabelStyle.SOLID, icon: "i-lucide-globe" },
-  { label: "Outline", value: LabelStyle.OUTLINE, icon: "i-lucide-users" },
-  { label: "Soft", value: LabelStyle.SOFT, icon: "i-lucide-lock" },
-  { label: "Subtle", value: LabelStyle.SUBTLE, icon: "i-lucide-lock" },
+  { label: "Solid", value: LabelStyle.SOLID },
+  { label: "Outline", value: LabelStyle.OUTLINE },
+  { label: "Soft", value: LabelStyle.SOFT },
+  { label: "Subtle", value: LabelStyle.SUBTLE },
 ]);
 
 const schema = z.object({
@@ -123,6 +123,15 @@ const state = reactive<Partial<SchemaIn>>({
   style: LabelStyle.SOLID,
   icon: undefined,
   color: undefined,
+});
+
+watch(modalOpen, (open) => {
+  if (!open) return;
+
+  state.title = "";
+  state.style = LabelStyle.SOLID;
+  state.icon = undefined;
+  state.color = undefined;
 });
 
 const createLabel = async (event: FormSubmitEvent<SchemaOut>) => {
