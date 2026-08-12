@@ -50,7 +50,7 @@
 
             <template #title-cell="{ row }">
               <Label
-                size="lg"
+                size="md"
                 :model="row.original"
               >
                 {{ row.getValue("title") }}
