@@ -30,7 +30,33 @@
             />
           </div>
 
-          <div class="flex w-full md:w-auto flex-wrap items-center">
+          <div class="flex w-full md:w-auto flex-wrap items-center gap-1.5">
+            <USelect
+              v-model="searchQuery.status"
+              :items="statusOptions"
+              placeholder="Any status.."
+              variant="soft"
+              size="md"
+              class="w-full md:w-40"
+            >
+              <template #trailing>
+                <UIcon
+                  v-if="searchQuery.status"
+                  name="i-lucide-x"
+                  role="button"
+                  aria-label="Clear status filter"
+                  class="shrink-0 text-dimmed hover:text-default"
+                  @pointerdown.stop
+                  @click.stop="searchQuery.status = undefined"
+                />
+                <UIcon
+                  v-else
+                  name="i-lucide-chevron-down"
+                  class="shrink-0 text-dimmed"
+                />
+              </template>
+            </USelect>
+
             <InputLabels
               v-model="searchQuery.labels"
               placeholder="Select labels.."
@@ -186,6 +212,7 @@ const table = useTemplateRef("table");
 const searchQuery = reactive({
   search: "",
   labels: [] as string[],
+  status: undefined as "published" | "draft" | undefined,
 });
 
 const albums = useState<
@@ -230,6 +257,11 @@ watch(searchQuery, () => {
 await callOnce(async () => fetchNextAlbums());
 
 type AlbumData = NonNullable<typeof albums.value>[number];
+
+const statusOptions = [
+  { label: "Published", value: "published", icon: "i-lucide-eye" },
+  { label: "Draft", value: "draft", icon: "i-lucide-pencil-line" },
+];
 
 const publishedProps = {
   true: { color: "success", icon: "i-lucide-eye" } as const,
