@@ -9,7 +9,7 @@ export default defineEventHandler(async (event) => {
     private: await allows(event, viewPrivateAlbums),
   };
 
-  const { search, labels, limit, offset, unpublished } =
+  const { search, labels, limit, offset, unpublished, status } =
     await getValidatedQuery(event, querySchema.parse);
 
   if (unpublished) {
@@ -56,6 +56,7 @@ export default defineEventHandler(async (event) => {
           ? sql`${tables.album.search} @@ to_tsquery('english', ${search} || ':*')`
           : sql`true`,
         !unpublished ? eq(tables.album.published, true) : undefined,
+        status ? eq(tables.album.published, status === "published") : sql`true`,
         or(
           accessLevels.public
             ? eq(tables.album.visibility, AlbumVisibility.PUBLIC)
@@ -87,6 +88,7 @@ const querySchema = z.object({
   offset: z.coerce.number().multipleOf(1).nonnegative().default(0),
   search: z.string().max(60).optional(),
   unpublished: z.coerce.boolean().default(false),
+  status: z.enum(["published", "draft"]).optional(),
   labels: z.preprocess(
     (val) => (typeof val === "string" ? [val] : val),
     z.array(z.cuid2()).max(4).default([]),
