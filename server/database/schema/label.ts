@@ -1,4 +1,11 @@
-import { char, pgEnum, pgTable, text, varchar } from "drizzle-orm/pg-core";
+import {
+  char,
+  integer,
+  pgEnum,
+  pgTable,
+  text,
+  varchar,
+} from "drizzle-orm/pg-core";
 import { cuid2, enumToPgEnum } from "./utils";
 import { relations } from "drizzle-orm";
 import { albumLabels } from "./albumLabels";
@@ -17,6 +24,7 @@ export const label = pgTable("label", {
   style: labelStyleColumn().default(LabelStyle.SOLID).notNull(),
   icon: text(),
   color: char({ length: 7 }),
+  ordering: integer().notNull().default(0),
 });
 
 export const labelRelations = relations(label, ({ many }) => ({

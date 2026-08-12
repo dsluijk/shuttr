@@ -1,3 +1,4 @@
+import { desc } from "drizzle-orm";
 import * as z from "zod";
 
 import { LabelStyle } from "~~/server/database/schema/label";
@@ -8,6 +9,12 @@ export default defineEventHandler(async (event) => {
   const body = await readValidatedBody(event, bodySchema.parse);
 
   const db = useDrizzle();
+  const [last] = await db
+    .select({ ordering: tables.label.ordering })
+    .from(tables.label)
+    .orderBy(desc(tables.label.ordering))
+    .limit(1);
+
   const result = await db
     .insert(tables.label)
     .values({
@@ -15,6 +22,7 @@ export default defineEventHandler(async (event) => {
       style: body.style,
       icon: body.icon,
       color: body.color,
+      ordering: (last?.ordering ?? -1) + 1,
     })
     .returning();
 

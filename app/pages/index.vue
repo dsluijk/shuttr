@@ -79,34 +79,13 @@
           </div>
 
           <div class="flex w-full md:w-auto flex-wrap items-center gap-1.5">
-            <USelectMenu
+            <InputLabels
               v-model="searchQuery.labels"
-              :items="labels"
-              :loading="labelsLoading"
-              valueKey="id"
-              labelKey="title"
               placeholder="Select labels.."
-              variant="soft"
               size="md"
               class="w-full md:w-48 overflow-hidden"
-              multiple
-            >
-              <template #default="{ modelValue }">
-                <Label
-                  v-for="(label, index) of mapLabelIds(modelValue ?? [])"
-                  :key="index"
-                  :model="label"
-                  size="sm"
-                  class="truncate max-w-24"
-                >
-                  {{ label?.title ?? "Unknown" }}
-                </Label>
-              </template>
-
-              <template #item="{ item: label }">
-                <Label :model="label">{{ label.title }}</Label>
-              </template>
-            </USelectMenu>
+              labelClass="truncate max-w-24"
+            />
           </div>
         </div>
       </Motion>
@@ -236,12 +215,6 @@ useSeoMeta({
   description: () => settings.value.description,
   ogDescription: () => settings.value.description,
 });
-
-const { data: labels, pending: labelsLoading } = await useFetch("/api/labels");
-const mapLabelIds = (labelIds: string[]) =>
-  labelIds.map((labelId) =>
-    labels.value?.find((label) => label.id === labelId),
-  );
 
 const searchQuery = reactive({
   search: "",
